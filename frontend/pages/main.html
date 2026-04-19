@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="calendar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Kosilo - Gimnazija Vič</title>
+</head>
+<body>
+    <div class="top-header">
+        <img src="../images/gimvic-logo.png" id="gimvic-logo">
+        <div class="user">
+            <span id="user-computer"></span>
+            <div class="user-button" onclick="showUserProfile();">
+                <img src="../images/user_profile.png" id="user-profile">
+                <i class="fa-solid fa-chevron-down"  style="color: rgb(194, 194, 194);"></i>
+            </div>
+        </div>
+    </div>
+    <div class="user-dropdown-menu" style="display: none;">
+        <label id="user-name-label"></label>
+        <label id="class-label"></label>
+        <label id="username-label"></label><hr><br>
+        <button id="change-password"  onclick="change_password();"><i class="fa-solid fa-key fa-xs"></i> Spremeni geslo</button><br>
+        <button id="logout" onclick="logout();"><i class="fa-solid fa-right-from-bracket fa-xs"></i> Odjava</button>
+    </div>
+    <div class="calendar">
+        <div class="header">
+            <button id="prevBtn">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="monthYear" id="monthYear"></div>
+            <div id="monthYear-yy-mm" style="display: none;"></div>
+            <button id="nextBtn">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="days">
+            <div class="day">Mon</div>
+            <div class="day">Tue</div>
+            <div class="day">Wed</div>
+            <div class="day">Thu</div>
+            <div class="day">Fri</div>
+            <div class="day">Sat</div>
+            <div class="day">Sun</div>
+        </div>
+        <div class="dates" id="dates"></div>
+    </div>
+
+    <div class="lunch-management">
+        <div class="buttons">
+            <button id="cancelBtn">Odjava kosila</button>
+            <button id="getBtn">Prekliči odjavo</button>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

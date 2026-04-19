@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Kosilo - Gimnazija Vič</title>
+</head>
+<body>
+    <div class="login">
+        <p id="welcome_text">Prijava v sistem</p>
+        <form autocomplete="off">
+            <!--Username input-->
+            <input type="text" id="username" placeholder="username" onkeydown="if(event.key === 'Enter') document.getElementById('password').focus()">
+            <!--Password input-->
+            <input type="password" id="password" placeholder="password" onkeydown="if(event.key === 'Enter') document.getElementById('submit_btn').focus()">
+        </form>
+
+        <button id="submit_btn">Submit</button>
+        <label id="errorLabel"></label>
+        <span id="errorIcon"></span>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
