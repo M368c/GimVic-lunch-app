@@ -50,6 +50,7 @@ form {
 
 #errorLabel {
   position: absolute;
+  text-align: center;
   margin-top: 262px;
   color: rgb(3, 3, 3);
   font-size: 16px;

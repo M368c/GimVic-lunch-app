@@ -42,7 +42,7 @@ async function login() {
     } 
     catch (error) {
         console.error(error);
-        console.log("DEBUG: Check if backend is running!");
+        document.getElementById("errorLabel").innerHTML = 'Server is currently down!';
         return false;
     }
 }
