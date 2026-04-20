@@ -46,21 +46,36 @@ async fn read(input_username: &str, pool: sqlx::Pool<sqlx::Postgres>) -> Result<
 
     match row {
         Some(user) => Ok(user),
-        None => Err("User not found in database".into()), // panic! ?
+        None => {
+            println!("User not found in database");
+            Err("User not found in database".into())
+        }
     }
 }
 
 pub async fn login(session: Session, State(pool): State<sqlx::Pool<sqlx::Postgres>>, Json(data): Json<Data>) -> Response {
-    let user_data: LoginData = read(data.username.as_str(), pool.clone()).await.unwrap();
-    let valid: bool = verify(data.password.as_str(), &user_data.password).unwrap();
+    let user_data: LoginData = match read(data.username.as_str(), pool.clone()).await {
+        Ok(t) => t,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, "Reading db in login failed").into_response()
+    };
+    let valid: bool = match verify(data.password.as_str(), &user_data.password) {
+        Ok(t) => t,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, "Verifying password failed").into_response()
+    };
 
     if valid {
         let response = user_data_frontend(&user_data);
         //Ok((data.id, response))
         println!("Login successful!");
         println!("User id is {:?}", user_data.id);
-        session.insert("user_id", user_data.id).await.unwrap();
-        (StatusCode::OK, response).into_response()
+        match session.insert("user_id", user_data.id).await {
+            Ok(_) => {
+                (StatusCode::OK, response).into_response()
+            }
+            Err(_) => {
+                (StatusCode::INTERNAL_SERVER_ERROR, "Session creation failed").into_response()
+            }
+        }
     } else {
         println!("Login failed!");
         (StatusCode::UNAUTHORIZED, "Invalid login!").into_response()
@@ -73,13 +88,14 @@ pub async fn auth_status() -> StatusCode {
 }
 
 pub async fn logout(session: Session) -> StatusCode {
-    match session.get::<Uuid>("user_id").await {
-        Ok(Some(_)) => {
-            session.flush().await.unwrap();
-            StatusCode::OK}
-        Ok(None) => {StatusCode::OK}
-        Err(e) => {println!("{}", e); StatusCode::OK}
-    }
+    match session.flush().await {
+        Ok(_) => StatusCode::OK,
+        Err(_) => {
+            eprintln!("Couldn't remove the session id!");
+            StatusCode::NOT_ACCEPTABLE
+        }
+    };
+    StatusCode::OK
 }
 
 pub async fn change_password() {

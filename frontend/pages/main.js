@@ -99,6 +99,7 @@ async function updateLunch(data) {
 }
 
 async function change_password() {
+    window.location.href = window.location.href.replace("pages/main.html", "pages/change_password.html");
     // Change password screen
     // Type old password and type new one
     // Update db with new password
@@ -120,8 +121,11 @@ async function logout() {
             "Content-Type": "application/json"
         },
     });
-    if (response.ok) {window.location.href = window.location.href.replace("pages/main.html", "index.html");} // Back to login page
-    
+    if (response.ok) {
+        window.location.href = window.location.href.replace("pages/main.html", "index.html");  // Go to login page
+        localStorage.clear();
+    }
+    else {console.error("Couldn't logout!")}
 }
 prevBtn.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth()-1);

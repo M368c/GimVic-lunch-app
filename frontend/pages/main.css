@@ -1,3 +1,13 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: rgb(223, 223, 223);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .top-header {
     position: fixed;
     width: 100%;

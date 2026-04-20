@@ -15,21 +15,48 @@ use uuid::Uuid;
 
 #[tokio::main]
 async fn main() {
-    dotenvy::dotenv().ok();
+    dotenvy::dotenv().ok(); // Load .env first
     let addr: &str = "127.0.0.1:3000"; // Change with correct URL for production
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = match tokio::net::TcpListener::bind(addr).await {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Failed to bind to {}: {}", addr, e);
+            std::process::exit(1);
+        }
+    };
     println!("Server running on {}", addr);
 
-    let url: &str = "postgres://admin:dev123@localhost:5432/myapp"; // Database
-    let pool: sqlx::Pool<sqlx::Postgres> = match sqlx::PgPool::connect(url).await
-    {
-        Ok(p) => {println!("Sucessfuly conected to db! You can view saved data on `http://127.0.0.1:8888/`"); p}
-        Err(e) => {panic!("Could not connect to database: {}", e)}
+    let database_connection = match std::env::var("DATABASE_URL") {
+        Ok(t) => t,
+        Err(_) => {
+            eprintln!("Couldn't find db info in .env file!");
+            std::process::exit(1);
+        }
     };
-    sqlx::migrate!("./migrations").run(&pool).await.unwrap();
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .max_connections(10)
+        .acquire_timeout(std::time::Duration::from_secs(3))
+        .idle_timeout(std::time::Duration::from_secs(600))
+        .connect(&database_connection)
+        .await
+        .expect("Could not connect to database");
+    
+    match sqlx::migrate!("./migrations").run(&pool).await {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Failed to run migrations: {}", e);
+            std::process::exit(1);
+        }
+    };
 
     let session_store: PostgresStore = PostgresStore::new(pool.clone());
-    session_store.migrate().await.unwrap();
+    match session_store.migrate().await {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Failed to run session store: {}", e);
+            std::process::exit(1);
+        }
+    };
 
     let session_layer = SessionManagerLayer::new(session_store)
         .with_path("/".to_string())
@@ -60,7 +87,13 @@ async fn main() {
         .layer(cors)
         .layer(session_layer);
 
-    axum::serve(listener, app).await.unwrap();
+    match axum::serve(listener, app).await {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("{}", e);
+            std::process::exit(1);
+        }
+    };
 }
 
 async fn auth(session: Session, req: Request, next: Next) -> impl IntoResponse {
