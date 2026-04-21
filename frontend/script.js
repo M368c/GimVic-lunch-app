@@ -1,8 +1,10 @@
+const server = "172.0.0.1:3000";
+
 // If cookie exsist and is correct let the user in
 auth_status()
 
 async function auth_status() {
-    const url = "http://127.0.0.1:3000/auth_status"; // HTTPS in production
+    const url = `http://${server}/auth_status`; // HTTPS in production
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -19,7 +21,7 @@ async function auth_status() {
 
 // POST request for users login
 async function login() {
-    const url = "http://127.0.0.1:3000/login"; // HTTPS in production
+    const url = `http://${server}/login`; // HTTPS in production
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -48,7 +50,7 @@ async function login() {
 }
 
 async function getLunchData() {
-    const url = "http://127.0.0.1:3000/lunch_data";
+    const url = `http://${server}/lunch_data`;
     try {
         const response = await fetch(url, {
             method: "GET",

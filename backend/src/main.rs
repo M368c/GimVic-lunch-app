@@ -16,7 +16,7 @@ use uuid::Uuid;
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok(); // Load .env first
-    let addr: &str = "127.0.0.1:3000"; // Change with correct URL for production
+    let addr: &str = "0.0.0.0:3000"; // Change with correct URL for production
     let listener = match tokio::net::TcpListener::bind(addr).await {
         Ok(t) => t,
         Err(e) => {
@@ -67,7 +67,7 @@ async fn main() {
 
     // CORS policy
     let cors = CorsLayer::new()
-        .allow_origin("http://127.0.0.1:5500".parse::<HeaderValue>().unwrap()) // For production replace 'Any' with frontend URL
+        .allow_origin("http://127.0.0.1:5500".parse::<HeaderValue>().unwrap()) // For production replace with domain name
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
         .allow_credentials(true);
@@ -84,8 +84,8 @@ async fn main() {
         .merge(protected_routes)
         .route("/login", post(login::login))
         .with_state(pool)
-        .layer(cors)
-        .layer(session_layer);
+        .layer(session_layer)
+        .layer(cors);
 
     match axum::serve(listener, app).await {
         Ok(t) => t,

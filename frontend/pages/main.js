@@ -1,3 +1,5 @@
+const server = "172.0.0.1:3000";
+
 const monthYearElement = document.getElementById('monthYear');
 const monthYearDateElement = document.getElementById('monthYear-yy-mm');
 const datesElement = document.getElementById('dates');
@@ -57,7 +59,7 @@ const updateCalendar = () => {
 }
 
 async function getLunchData() {
-    const url = "http://127.0.0.1:3000/lunch_data";
+    const url = `http://${server}/lunch_data`;
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -79,7 +81,7 @@ async function getLunchData() {
 }
 
 async function updateLunch(data) {
-    const url = "http://127.0.0.1:3000/update_lunch_data"; // HTTPS in production
+    const url = `http://${server}/update_lunch_data`; // HTTPS in production
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -104,7 +106,7 @@ async function change_password() {
     // Type old password and type new one
     // Update db with new password
     // Refresh the auth cookie
-    const url = "http://127.0.0.1:3000/change_password";
+    const url = `http://${server}/change_password`;
     const response = await fetch(url, {
         method: "POST",
         credentials: "include",
@@ -113,7 +115,7 @@ async function change_password() {
 }
 
 async function logout() {
-    const url = "http://127.0.0.1:3000/logout";
+    const url = `http://${server}/logout`;
     const response = await fetch(url, {
         method: "POST",
         credentials: "include",
