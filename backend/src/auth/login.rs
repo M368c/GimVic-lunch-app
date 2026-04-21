@@ -94,8 +94,7 @@ pub async fn logout(session: Session) -> StatusCode {
             eprintln!("Couldn't remove the session id!");
             StatusCode::NOT_ACCEPTABLE
         }
-    };
-    StatusCode::OK
+    }
 }
 
 pub async fn change_password() {
