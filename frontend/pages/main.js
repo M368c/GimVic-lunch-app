@@ -1,186 +1,5 @@
-const server = "127.0.0.1:3000";
-
-const monthYearElement = document.getElementById('monthYear');
-const monthYearDateElement = document.getElementById('monthYear-yy-mm');
-const datesElement = document.getElementById('dates');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-
-// Buttons
-const cancelBtn = document.getElementById('cancelBtn');
-const getBtn = document.getElementById('getBtn');
-const saveBtn = document.getElementById('saveBtn');
-
-const cancel_status = `cancel`;
-const ok_status = `ok`;
-
-let currentDate = new Date();
-
-const updateCalendar = () => {
-    const currentYear = currentDate.getFullYear();
-    const lastMonth = currentDate.getMonth();
-
-    const firstDay = new Date(currentYear, lastMonth, 0); // first day
-    const lastDay = new Date(currentYear, lastMonth + 1, 0); // +1 because they starts from 0
-    const totalDays = lastDay.getDate();
-    const firstDayIndex = firstDay.getDay(); // Day in the week
-    const lastDayIndex = lastDay.getDay();
-
-    const monthYearString = currentDate.toLocaleString
-    ('default', {month: 'long', year: 'numeric'});
-    const monthYearDateFormat = currentDate.toLocaleString
-    ("sv-SE", {year: 'numeric', month: 'numeric'});
-
-    monthYearElement.textContent = monthYearString;
-    monthYearDateElement.textContent = monthYearDateFormat;
-
-    let datesHTML = '';
-
-    for (let i = 0; i < firstDayIndex; i++) {
-        const prevDate = firstDay.getDate() - firstDayIndex + 1 + i;
-        datesHTML += `<div class="date inactive">${prevDate}</div>`;
-    }
-
-    for (let i = 1; i<=totalDays; i++) {
-        const date = new Date(currentYear, lastMonth, i);
-        const activeClass = date.toDateString() === new Date().toDateString() ? 'active' : '';
-        let weekend = '';
-        let id = ok_status;
-
-        if (date.getDay() === 6 || date.getDay() === 0) {
-            weekend = 'weekend';
-            id = 'weekend';
-        }
-        
-        datesHTML += `<button id="${id}" class="date ${activeClass} ${weekend}" >${i}</button>`;
-    }
-
-    for (let i = 1; i<=7-lastDayIndex; i++) {
-        const nextDate = new Date(currentYear, lastMonth+1, i);
-        datesHTML += `<div class="date inactive">${nextDate.getDate()}</div>`;
-    }
-
-    datesElement.innerHTML = datesHTML;
-
-    restoreCalendarState();
-}
-
-async function getLunchData() {
-    const url = `http://${server}/lunch_data`;
-    try {
-        const response = await fetch(url, {
-            method: "GET",
-            credentials: "include",
-        });
-        console.log("Lunch data on login: ", response.status);
-        if (response.ok) {
-            const data = await response.json();
-            localStorage.removeItem('savedLunchData');
-            console.log("Lunch data are: ", JSON.stringify(data));
-            localStorage.setItem('savedLunchData', JSON.stringify(data));
-        }
-    }
-    catch (error) {
-        console.log("Couldn't get lunch data! (frontend)");
-        console.error(error);
-        return false;
-    }
-}
-
-async function updateLunch(data) {
-    const url = `http://${server}/update_lunch_data`; // HTTPS in production
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-            window.location.href = window.location.href.replace("pages/main.html", "index.html"); // Back to login page
-        }
-    } catch (error) {
-        console.error(error);
-        console.log("DEBUG: Check if backend is running!"); // Remove for production
-    }
-}
-
-async function change_password() {
-    window.location.href = window.location.href.replace("pages/main.html", "pages/change_password.html");
-    // Change password screen
-    // Type old password and type new one
-    // Update db with new password
-    // Refresh the auth cookie
-    const url = `http://${server}/change_password`;
-    const response = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: {"Content-Type": "application/json"},
-    });
-}
-
-async function logout() {
-    const url = `http://${server}/logout`;
-    const response = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-    });
-    if (response.ok) {
-        window.location.href = window.location.href.replace("pages/main.html", "index.html");  // Go to login page
-        localStorage.clear();
-    }
-    else {console.error("Couldn't logout!")}
-}
-
-// User can view data just for current month and next one
-prevBtn.addEventListener('click', () => {
-    if (currentDate.getMonth()-1 >= new Date().getMonth()) {
-        currentDate.setMonth(currentDate.getMonth()-1);
-        updateCalendar();
-    }
-})
-nextBtn.addEventListener('click', () => {
-    if (currentDate.getMonth()+1 <= new Date().getMonth()+1) {
-        currentDate.setMonth(currentDate.getMonth()+1);
-        updateCalendar();
-    }
-})
-
-// Selecting dates
-datesElement.addEventListener('click', (event) => {
-    if (event.target.classList.contains('date') && !event.target.classList.contains('inactive') && !event.target.classList.contains('weekend')) {
-        const selected = datesElement.querySelector('.selected');
-        if (selected) selected.classList.remove('selected');
-        event.target.classList.add('selected');
-    }
-})
-
-function restoreCalendarState() {
-    if (localStorage.getItem('savedLunchData') != null) {
-        const lunchData = JSON.parse(localStorage.getItem('savedLunchData'));
-        const allDays = datesElement.querySelectorAll('.date:not(.inactive)');
-
-        allDays.forEach(day => {
-            // All numbers the same size
-            let number = `${day.textContent}`;
-            if (number / 10 < 1) {
-                number = `0${day.textContent}`
-            }
-
-            for (const item of lunchData) {
-                let value_string = item.date;
-                if (monthYearDateElement.textContent == value_string.substring(0, 7) && number == value_string.substring(8, 10)){
-                    day.id = cancel_status;
-                }
-            }
-        });
-    }
-}
+import { change_password, logout } from "../APIs/login.js";
+import { getLunchData, updateLunch } from "../APIs/lunch_data.js";
 
 async function syncCalendarWithBackend() {
     const localData = localStorage.getItem('calendarData');
@@ -200,7 +19,7 @@ function saveDateStatus(dateText, status) {
 
     let calendarData = [];
     if (localStorage.getItem('calendarData')) {
-        for (i in JSON.parse(localStorage.getItem('calendarData'))) {
+        for (let i in JSON.parse(localStorage.getItem('calendarData'))) {
             calendarData.push(i);
         }
     }
@@ -222,22 +41,30 @@ function saveDateStatus(dateText, status) {
 // Main buttons for lunch handling
 cancelBtn.addEventListener('click', () => {
     let selected = datesElement.querySelector('.selected');
-    selected.id = cancel_status;
-    saveDateStatus(selected.textContent, 'cancel');
-    selected.classList.remove('selected');
+    if (selected) {
+        selected.id = cancel_status;
+        saveDateStatus(selected.textContent, 'cancel');
+        selected.classList.remove('selected');
+    }
 });
 
 getBtn.addEventListener('click', () => {
     let selected = datesElement.querySelector('.selected');
-    selected.id = ok_status;
-    saveDateStatus(selected.textContent, 'ok');
-    selected.classList.remove('selected');
+    if (selected) {
+        selected.id = ok_status;
+        saveDateStatus(selected.textContent, 'ok');
+        selected.classList.remove('selected');
+    }
 });
 
 // User profile
 const userBtn = document.querySelector('.user-button');
 const userDropdown = document.querySelector('.user-dropdown-menu');
 let is_dropdown_open = false;
+
+userBtn.addEventListener('click', () => {
+    showUserProfile();
+});
 
 function showUserProfile() {
     if (!is_dropdown_open) {
@@ -253,6 +80,19 @@ function showUserProfile() {
 }
 
 updateCalendar();
+
+// Change password and login
+const change_password_button = document.getElementById('change-password');
+const logout_button = document.getElementById('logout');
+
+change_password_button.addEventListener('click', () => {
+    change_password();
+});
+
+logout_button.addEventListener('click', () => {
+    logout();
+});
+
 
 // Populate user profile with data
 // Also need the class for all the users -- add to db

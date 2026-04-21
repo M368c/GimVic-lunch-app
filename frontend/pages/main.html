@@ -13,7 +13,7 @@
         <img src="../images/gimvic-logo.png" id="gimvic-logo">
         <div class="user">
             <span id="user-computer"></span>
-            <div class="user-button" onclick="showUserProfile();">
+            <div class="user-button">
                 <img src="../images/user_profile.png" id="user-profile">
                 <i class="fa-solid fa-chevron-down"  style="color: rgb(194, 194, 194);"></i>
             </div>
@@ -23,8 +23,8 @@
         <label id="user-name-label"></label>
         <label id="class-label"></label>
         <label id="username-label"></label><hr><br>
-        <button id="change-password"  onclick="change_password();"><i class="fa-solid fa-key fa-xs"></i> Spremeni geslo</button><br>
-        <button id="logout" onclick="logout();"><i class="fa-solid fa-right-from-bracket fa-xs"></i> Odjava</button>
+        <button id="change-password"><i class="fa-solid fa-key fa-xs"></i> Spremeni geslo</button><br>
+        <button id="logout"><i class="fa-solid fa-right-from-bracket fa-xs"></i> Odjava</button>
     </div>
     <div class="calendar">
         <div class="header">
@@ -55,6 +55,7 @@
             <button id="getBtn">Prekliči odjavo</button>
         </div>
     </div>
-    <script src="main.js"></script>
+    <script src="main.js" type="module"></script>
+    <script src="calendar.js"></script>
 </body>
 </html>
