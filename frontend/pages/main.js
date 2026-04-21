@@ -42,8 +42,10 @@ function saveDateStatus(dateText, status) {
 cancelBtn.addEventListener('click', () => {
     let selected = datesElement.querySelector('.selected');
     if (selected) {
-        selected.id = cancel_status;
-        saveDateStatus(selected.textContent, 'cancel');
+        if (selected.id !== cancel_status) {
+            selected.id = cancel_status;
+            saveDateStatus(selected.textContent, 'cancel');
+        }
         selected.classList.remove('selected');
     }
 });
@@ -51,8 +53,10 @@ cancelBtn.addEventListener('click', () => {
 getBtn.addEventListener('click', () => {
     let selected = datesElement.querySelector('.selected');
     if (selected) {
-        selected.id = ok_status;
-        saveDateStatus(selected.textContent, 'ok');
+        if (selected.id !== ok_status) {
+            selected.id = ok_status;
+            saveDateStatus(selected.textContent, 'ok');
+        }
         selected.classList.remove('selected');
     }
 });
