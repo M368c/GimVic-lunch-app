@@ -16,7 +16,7 @@ use uuid::Uuid;
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok(); // Load .env first
-    let addr: &str = "0.0.0.0:3000"; // Change with correct URL for production
+    let addr: &str = "127.0.0.1:3000"; // Change with correct URL for production
     let listener = match tokio::net::TcpListener::bind(addr).await {
         Ok(t) => t,
         Err(e) => {

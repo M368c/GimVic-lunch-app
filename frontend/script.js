@@ -1,4 +1,4 @@
-const server = "172.0.0.1:3000";
+const server = "127.0.0.1:3000";
 
 // If cookie exsist and is correct let the user in
 auth_status()

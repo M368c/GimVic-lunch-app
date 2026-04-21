@@ -1,4 +1,4 @@
-const server = "172.0.0.1:3000";
+const server = "127.0.0.1:3000";
 
 const monthYearElement = document.getElementById('monthYear');
 const monthYearDateElement = document.getElementById('monthYear-yy-mm');
