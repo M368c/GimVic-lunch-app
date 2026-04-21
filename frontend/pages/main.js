@@ -41,11 +41,18 @@ const updateCalendar = () => {
         datesHTML += `<div class="date inactive">${prevDate}</div>`;
     }
 
-    for(let i = 1; i<=totalDays; i++){
+    for (let i = 1; i<=totalDays; i++) {
         const date = new Date(currentYear, lastMonth, i);
-        const activeClass = date.toDateString() === new Date()
-        .toDateString() ? 'active' : '';
-        datesHTML += `<button id="${ok_status}" class="date ${activeClass}" >${i}</button>`;
+        const activeClass = date.toDateString() === new Date().toDateString() ? 'active' : '';
+        let weekend = '';
+        let id = ok_status;
+
+        if (date.getDay() === 6 || date.getDay() === 0) {
+            weekend = 'weekend';
+            id = 'weekend';
+        }
+        
+        datesHTML += `<button id="${id}" class="date ${activeClass} ${weekend}" >${i}</button>`;
     }
 
     for (let i = 1; i<=7-lastDayIndex; i++) {
@@ -129,19 +136,24 @@ async function logout() {
     }
     else {console.error("Couldn't logout!")}
 }
-prevBtn.addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth()-1);
-    updateCalendar();
-})
 
+// User can view data just for current month and next one
+prevBtn.addEventListener('click', () => {
+    if (currentDate.getMonth()-1 >= new Date().getMonth()) {
+        currentDate.setMonth(currentDate.getMonth()-1);
+        updateCalendar();
+    }
+})
 nextBtn.addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth()+1);
-    updateCalendar();
+    if (currentDate.getMonth()+1 <= new Date().getMonth()+1) {
+        currentDate.setMonth(currentDate.getMonth()+1);
+        updateCalendar();
+    }
 })
 
 // Selecting dates
 datesElement.addEventListener('click', (event) => {
-    if (event.target.classList.contains('date') && !event.target.classList.contains('inactive')) {
+    if (event.target.classList.contains('date') && !event.target.classList.contains('inactive') && !event.target.classList.contains('weekend')) {
         const selected = datesElement.querySelector('.selected');
         if (selected) selected.classList.remove('selected');
         event.target.classList.add('selected');

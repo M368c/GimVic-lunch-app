@@ -92,6 +92,10 @@
     background-color: rgba(255, 0, 0, 0.448);
 }
 
+#weekend {
+    background: rgb(224, 222, 222);
+}
+
 .date.inactive {
     color: #ccc;
     cursor: default;
@@ -106,4 +110,8 @@
 .date.selected {
     background-color: rgb(182, 182, 182) !important;
     color: rgb(0,0,0);
+}
+.date.weekend:hover {
+    background: rgb(224, 222, 222);
+    cursor: default;
 }
