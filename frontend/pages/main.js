@@ -1,4 +1,4 @@
-import { change_password, logout } from "../APIs/login.js";
+import { logout } from "../APIs/login.js";
 import { getLunchData, updateLunch } from "../APIs/lunch_data.js";
 
 async function syncCalendarWithBackend() {
@@ -90,7 +90,7 @@ const change_password_button = document.getElementById('change-password');
 const logout_button = document.getElementById('logout');
 
 change_password_button.addEventListener('click', () => {
-    change_password();
+    window.location.href = window.location.href.replace("pages/main.html", "pages/change_password.html");
 });
 
 logout_button.addEventListener('click', () => {

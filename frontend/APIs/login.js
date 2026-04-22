@@ -46,32 +46,40 @@ export async function login() {
     }
 }
 
-export async function change_password() {
-    window.location.href = window.location.href.replace("pages/main.html", "pages/change_password.html");
-    // Change password screen
-    // Type old password and type new one
+export async function change_password(current_password, new_password) {
+    // Check if current_password is correct
     // Update db with new password
     // Refresh the auth cookie
     const url = `${server_url}/change_password`;
-    const response = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: {"Content-Type": "application/json"},
-    });
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            credentials: "include",
+            headers: {"Content-Type": "application/json"},
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
 }
 
 export async function logout() {
     const url = `${server_url}/logout`;
-    const response = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-    });
-    if (response.ok) {
-        window.location.href = window.location.href.replace("pages/main.html", "index.html");  // Go to login page
-        localStorage.clear();
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
+        if (response.ok) {
+            window.location.href = window.location.href.replace("pages/main.html", "index.html");  // Go to login page
+            localStorage.clear();
+        }
+        else {console.log("Couldn't logout!")}
     }
-    else {console.error("Couldn't logout!")}
+    catch (error) {
+        console.error(error);
+    }
 }
