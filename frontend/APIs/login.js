@@ -1,4 +1,4 @@
-import {server_url} from './url.js';
+import { server_url } from "./url.js";
 
 // Check for correct auth cookie
 export async function auth_status() {
@@ -10,10 +10,12 @@ export async function auth_status() {
         });
         if (response.ok) {
             // Go to main page
-            window.location.href = window.location.href.replace("index.html", "pages/main.html");
+            window.location.href = window.location.href.replace(
+                "index.html",
+                "pages/main.html",
+            );
         }
-    }
-    catch (err) {}
+    } catch (err) {}
 }
 
 // Login
@@ -22,26 +24,30 @@ export async function login() {
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ username: document.getElementById("username").value, password: document.getElementById("password").value}),
+            body: JSON.stringify({
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value,
+            }),
         });
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('UserData', JSON.stringify(data.user));
+            localStorage.setItem("UserData", JSON.stringify(data.user));
             return true;
-        }
-        else {
-            document.getElementById("errorLabel").textContent = 'Poskusi ponovno!';
-            document.getElementById("errorIcon").innerHTML = '<i class="fas fa-exclamation-circle" style="color: red;"></i>';
+        } else {
+            document.getElementById("errorLabel").textContent =
+                "Poskusi ponovno!";
+            document.getElementById("errorIcon").innerHTML =
+                '<i class="fas fa-exclamation-circle" style="color: red;"></i>';
             document.getElementById("username").value = "";
             document.getElementById("password").value = "";
             return false;
         }
-    } 
-    catch (error) {
+    } catch (error) {
         console.error(error);
-        document.getElementById("errorLabel").innerHTML = 'Server is currently down!';
+        document.getElementById("errorLabel").innerHTML =
+            "Server is currently down!";
         return false;
     }
 }
@@ -55,10 +61,9 @@ export async function change_password(current_password, new_password) {
         const response = await fetch(url, {
             method: "POST",
             credentials: "include",
-            headers: {"Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -70,16 +75,19 @@ export async function logout() {
             method: "POST",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
         });
         if (response.ok) {
-            window.location.href = window.location.href.replace("pages/main.html", "index.html");  // Go to login page
+            window.location.href = window.location.href.replace(
+                "pages/main.html",
+                "index.html",
+            ); // Go to login page
             localStorage.clear();
+        } else {
+            console.log("Couldn't logout!");
         }
-        else {console.log("Couldn't logout!")}
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }

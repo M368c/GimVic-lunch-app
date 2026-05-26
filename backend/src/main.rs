@@ -1,17 +1,22 @@
 mod auth;
 mod lunch;
-use auth::login;
-use lunch::lunch_management;
 use crate::header::HeaderValue;
-use axum::{Router, http::{header, Method, status::StatusCode}, extract::Request, response::{IntoResponse}, routing::{post, get}};
+use auth::login;
 use axum::middleware;
 use axum::middleware::Next;
+use axum::{
+    Router,
+    extract::Request,
+    http::{Method, header, status::StatusCode},
+    response::IntoResponse,
+    routing::{get, post},
+};
 use axum_extra::extract::cookie::SameSite;
-use tower_http::cors::{CorsLayer};
+use lunch::lunch_management;
+use tower_http::cors::CorsLayer;
+use tower_sessions::{Expiry, Session, SessionManagerLayer};
 use tower_sessions_sqlx_store_chrono::PostgresStore;
-use tower_sessions::{Session, Expiry, SessionManagerLayer};
 use uuid::Uuid;
-
 
 #[tokio::main]
 async fn main() {
@@ -40,7 +45,7 @@ async fn main() {
         .connect(&database_connection)
         .await
         .expect("Could not connect to database");
-    
+
     match sqlx::migrate!("./migrations").run(&pool).await {
         Ok(t) => t,
         Err(e) => {
@@ -63,7 +68,9 @@ async fn main() {
         .with_http_only(true)
         .with_same_site(SameSite::Lax)
         .with_secure(false) // true in production
-        .with_expiry(Expiry::OnInactivity(tower_sessions::cookie::time::Duration::days(14))); // 14 days - maybe change for production
+        .with_expiry(Expiry::OnInactivity(
+            tower_sessions::cookie::time::Duration::days(14),
+        )); // 14 days - maybe change for production
 
     // CORS policy
     let cors = CorsLayer::new()

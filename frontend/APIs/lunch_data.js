@@ -1,4 +1,4 @@
-import {server_url} from './url.js';
+import { server_url } from "./url.js";
 
 // Lunch data for frontend
 export async function getLunchData() {
@@ -11,14 +11,14 @@ export async function getLunchData() {
         console.log("Lunch data on login: ", response.status);
         if (response.ok) {
             const data = await response.json();
-            localStorage.removeItem('savedLunchData');
+            localStorage.removeItem("savedLunchData");
             console.log("Lunch data are: ", JSON.stringify(data));
-            localStorage.setItem('savedLunchData', JSON.stringify(data));
+            localStorage.setItem("savedLunchData", JSON.stringify(data));
             return true;
+        } else {
+            return false;
         }
-        else {return false;}
-    }
-    catch (error) {
+    } catch (error) {
         console.log("Couldn't get lunch data! (frontend)");
         console.error(error);
         return false;
@@ -33,12 +33,15 @@ export async function updateLunch(data) {
             method: "POST",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
         });
         if (!response.ok) {
-            window.location.href = window.location.href.replace("pages/main.html", "index.html");
+            window.location.href = window.location.href.replace(
+                "pages/main.html",
+                "index.html",
+            );
         }
     } catch (error) {
         console.error(error);

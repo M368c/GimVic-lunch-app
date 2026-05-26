@@ -1,11 +1,11 @@
-use std::error::Error;
-use uuid::Uuid;
-use axum::{Json, response::Response};
+use axum::extract::State;
 use axum::http::status::StatusCode;
 use axum::response::IntoResponse;
-use axum::extract::State;
+use axum::{Json, response::Response};
 use serde::Serialize;
+use std::error::Error;
 use tower_sessions::Session;
+use uuid::Uuid;
 
 extern crate bcrypt;
 use bcrypt::verify;
@@ -37,7 +37,10 @@ pub struct LoginResponse {
     user: User,
 }
 
-async fn read(input_username: &str, pool: sqlx::Pool<sqlx::Postgres>) -> Result<LoginData, Box<dyn Error + Send + Sync>> {
+async fn read(
+    input_username: &str,
+    pool: sqlx::Pool<sqlx::Postgres>,
+) -> Result<LoginData, Box<dyn Error + Send + Sync>> {
     let q = "SELECT id, first_name, last_name, username, password FROM users WHERE username = $1";
     let row = sqlx::query_as::<_, LoginData>(q)
         .bind(input_username)
@@ -53,25 +56,37 @@ async fn read(input_username: &str, pool: sqlx::Pool<sqlx::Postgres>) -> Result<
     }
 }
 
-pub async fn login(session: Session, State(pool): State<sqlx::Pool<sqlx::Postgres>>, Json(data): Json<Data>) -> Response {
+pub async fn login(
+    session: Session,
+    State(pool): State<sqlx::Pool<sqlx::Postgres>>,
+    Json(data): Json<Data>,
+) -> Response {
     let user_data: LoginData = match read(data.username.as_str(), pool.clone()).await {
         Ok(t) => t,
-        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, "Reading db in login failed").into_response()
+        Err(_) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Reading db in login failed",
+            )
+                .into_response();
+        }
     };
     let valid: bool = match verify(data.password.as_str(), &user_data.password) {
         Ok(t) => t,
-        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, "Verifying password failed").into_response()
+        Err(_) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Verifying password failed",
+            )
+                .into_response();
+        }
     };
 
     if valid {
         let response = user_data_frontend(&user_data);
-        //Ok((data.id, response))
         println!("Login successful!");
-        println!("User id is {:?}", user_data.id);
         match session.insert("user_id", user_data.id).await {
-            Ok(_) => {
-                (StatusCode::OK, response).into_response()
-            }
+            Ok(_) => (StatusCode::OK, response).into_response(),
             Err(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "Session creation failed").into_response()
             }
@@ -108,6 +123,6 @@ fn user_data_frontend(data: &LoginData) -> Json<LoginResponse> {
             first_name: data.first_name.clone(),
             last_name: data.last_name.clone(),
             username: data.username.clone(),
-        }
+        },
     })
 }
