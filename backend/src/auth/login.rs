@@ -25,10 +25,10 @@ pub struct Data {
     password: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct User {
-    first_name: String,
-    last_name: String,
+    pub first_name: String,
+    pub last_name: String,
     username: String,
 }
 
