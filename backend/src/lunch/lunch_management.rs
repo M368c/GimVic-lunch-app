@@ -226,7 +226,10 @@ async fn update_database(
 
         match mailer.send(&final_email) {
             Ok(_) => println!("Email sent successfully!"),
-            Err(e) => println!("Could not send email: {e:?}"),
+            Err(e) => {
+                println!("Could not send email: {e:?}");
+                std::process::exit(1);
+            }
         }
     }
     Ok(())
