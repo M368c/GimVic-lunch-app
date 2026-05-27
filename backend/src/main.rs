@@ -155,10 +155,9 @@ async fn auth(session: Session, req: Request, next: Next) -> impl IntoResponse {
     }
     let user_id: Option<Uuid> = session.get("user_id").await.unwrap_or(None);
     if let Some(_id) = user_id {
-        //println!("Session id CORRECT! (backend)");
         next.run(req).await
     } else {
-        println!("Session id not correct! (backend)");
+        println!("Session id not correct!");
         (StatusCode::UNAUTHORIZED, "Not authenticated").into_response()
     }
 }

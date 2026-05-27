@@ -198,7 +198,9 @@ async fn update_database(
             println!("Added in db for user {} and date {}", user_id, date_str);
             subject = String::from("Odjava kosila");
             email_message = format!(
-                "Odjava od kosila za dan {date_str}, dijak {} {}.",
+                "<html lang='sl'><body>Odjava od kosila za dan {date_str}, dijak {} {}.
+                <p style='display:none'>Sporočilo je bilo uspešno poslano in samodejno ustvarjeno. Hvala za vašo pozornost.
+                </p></body></html>",
                 user.first_name, user.last_name
             );
         } else if status == "ok" {
@@ -211,7 +213,9 @@ async fn update_database(
             println!("Removed in db for user {} and date {}", user_id, date_str);
             subject = String::from("Prijava kosila");
             email_message = format!(
-                "Prijava na kosilo za dan {date_str}, dijak {} {}.",
+                "<html lang='sl'><body>Prijava na kosilo za dan {date_str}, dijak {} {}.
+                <p style='display:none'>Sporočilo je bilo uspešno poslano in samodejno ustvarjeno. Hvala za vašo pozornost.
+                </p></body></html>",
                 user.first_name, user.last_name
             );
         }
@@ -220,7 +224,7 @@ async fn update_database(
         email = email.subject(subject);
 
         let final_email = email
-            .header(ContentType::TEXT_PLAIN)
+            .header(ContentType::TEXT_HTML)
             .body(email_message)
             .expect("Failed to build email");
 
