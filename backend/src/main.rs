@@ -122,10 +122,10 @@ async fn main() {
         .allow_credentials(true);
 
     let protected_routes = Router::new()
-        .route("/auth_status", get(login::auth_status))
-        .route("/lunch_data", get(lunch_management::lunch_data))
-        .route("/logout", post(login::logout))
-        .route("/change_password", post(login::change_password))
+        .route("/api/auth_status", get(login::auth_status))
+        .route("/api/lunch_data", get(lunch_management::lunch_data))
+        .route("/api/logout", post(login::logout))
+        .route("/api/change_password", post(login::change_password))
         .route_layer(middleware::from_fn(auth));
 
     let lunch_state = LunchState {
@@ -134,14 +134,17 @@ async fn main() {
     };
 
     let lunch_route = Router::new()
-        .route("/update_lunch_data", post(lunch_management::lunch_handling))
+        .route(
+            "/api/update_lunch_data",
+            post(lunch_management::lunch_handling),
+        )
         .with_state(lunch_state)
         .route_layer(middleware::from_fn(auth));
 
     let app = Router::new()
         .merge(protected_routes)
         .merge(lunch_route)
-        .route("/login", post(login::login))
+        .route("/api/login", post(login::login))
         .with_state(pool)
         .layer(session_layer)
         .layer(cors);
