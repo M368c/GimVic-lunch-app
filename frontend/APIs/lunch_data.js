@@ -2,7 +2,7 @@ import { server_url } from "./url.js";
 
 // Lunch data for frontend
 export async function getLunchData() {
-    const url = `${server_url}/lunch_data`;
+    const url = `${server_url}/api/lunch_data`;
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -27,7 +27,7 @@ export async function getLunchData() {
 
 // Update database
 export async function updateLunch(data) {
-    const url = `${server_url}/update_lunch_data`;
+    const url = `${server_url}/api/update_lunch_data`;
     try {
         const response = await fetch(url, {
             method: "POST",

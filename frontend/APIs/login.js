@@ -2,7 +2,7 @@ import { server_url } from "./url.js";
 
 // Check for correct auth cookie
 export async function auth_status() {
-    const url = `${server_url}/auth_status`;
+    const url = `${server_url}/api/auth_status`;
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -20,7 +20,7 @@ export async function auth_status() {
 
 // Login
 export async function login() {
-    const url = `${server_url}/login`;
+    const url = `${server_url}/api/login`;
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -56,7 +56,7 @@ export async function change_password(current_password, new_password) {
     // Check if current_password is correct
     // Update db with new password
     // Refresh the auth cookie
-    const url = `${server_url}/change_password`;
+    const url = `${server_url}/api/change_password`;
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -69,7 +69,7 @@ export async function change_password(current_password, new_password) {
 }
 
 export async function logout() {
-    const url = `${server_url}/logout`;
+    const url = `${server_url}/api/logout`;
     try {
         const response = await fetch(url, {
             method: "POST",

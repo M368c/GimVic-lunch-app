@@ -47,13 +47,19 @@ async fn main() {
             std::process::exit(1);
         }
     };
-    let pool = sqlx::postgres::PgPoolOptions::new()
+    let pool = match sqlx::postgres::PgPoolOptions::new()
         .max_connections(10)
         .acquire_timeout(std::time::Duration::from_secs(3))
         .idle_timeout(std::time::Duration::from_secs(600))
         .connect(&database_connection)
         .await
-        .expect("Could not connect to database");
+    {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Could not connect to database! {}", e);
+            std::process::exit(1);
+        }
+    };
 
     match sqlx::migrate!("./migrations").run(&pool).await {
         Ok(t) => t,
