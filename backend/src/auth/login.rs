@@ -8,7 +8,7 @@ use tower_sessions::Session;
 use uuid::Uuid;
 
 extern crate bcrypt;
-use bcrypt::verify;
+use bcrypt::{DEFAULT_COST, hash, verify};
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
 struct LoginData {
@@ -19,7 +19,7 @@ struct LoginData {
     password: String,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, sqlx::FromRow)]
 pub struct Data {
     username: String,
     password: String,
@@ -35,6 +35,12 @@ pub struct User {
 #[derive(Debug, Serialize)]
 pub struct LoginResponse {
     user: User,
+}
+
+#[derive(serde::Deserialize, sqlx::FromRow)]
+pub struct ChangePassword {
+    password: String,
+    new_password: String,
 }
 
 async fn read(
@@ -112,8 +118,67 @@ pub async fn logout(session: Session) -> StatusCode {
     }
 }
 
-pub async fn change_password() {
+pub async fn change_password(
+    session: Session,
+    State(pool): State<sqlx::Pool<sqlx::Postgres>>,
+    Json(data): Json<ChangePassword>,
+) -> StatusCode {
     println!("Changing password!");
+
+    let user_id: Uuid = match session.get::<Uuid>("user_id").await {
+        Ok(Some(id)) => id,
+        _ => return StatusCode::UNAUTHORIZED,
+    };
+
+    let q: &str = "SELECT username, password FROM users WHERE id = $1";
+    let row = sqlx::query_as::<_, Data>(q)
+        .bind(user_id)
+        .fetch_optional(&pool)
+        .await;
+
+    let hashed_new_password = hash(data.new_password, DEFAULT_COST).unwrap();
+
+    match row {
+        Ok(Some(user)) => {
+            let is_valid = verify(data.password.as_str(), &user.password);
+            match is_valid {
+                Ok(true) => {
+                    let q: &str = "UPDATE users SET password = $1 WHERE id = $2";
+                    let new_row = sqlx::query(q)
+                        .bind(hashed_new_password)
+                        .bind(user_id)
+                        .execute(&pool)
+                        .await;
+                    match new_row {
+                        Ok(_) => {
+                            println!("Successfully update password for user");
+                            StatusCode::OK
+                        }
+                        Err(_e) => {
+                            println!("Error while updating password for user");
+                            StatusCode::BAD_REQUEST
+                        }
+                    }
+                }
+                Ok(false) => {
+                    println!("Password not correct!");
+                    StatusCode::BAD_REQUEST
+                }
+                Err(e) => {
+                    println!("Error while changing password {} for user {}", e, user_id);
+                    StatusCode::BAD_REQUEST
+                }
+            }
+        }
+        Ok(None) => {
+            logout(session).await;
+            StatusCode::NOT_FOUND
+        }
+        Err(e) => {
+            println!("Error while changing password {} for user {}", e, user_id);
+            StatusCode::BAD_REQUEST
+        }
+    }
 }
 
 fn user_data_frontend(data: &LoginData) -> Json<LoginResponse> {

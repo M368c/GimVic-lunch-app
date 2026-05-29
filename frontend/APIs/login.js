@@ -52,19 +52,34 @@ export async function login() {
     }
 }
 
-export async function change_password(current_password, new_password) {
-    // Check if current_password is correct
-    // Update db with new password
-    // Refresh the auth cookie
+export async function change_password() {
     const url = `${server_url}/api/change_password`;
     try {
         const response = await fetch(url, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                password: document.getElementById("current_password_input")
+                    .value,
+                new_password:
+                    document.getElementById("new_password_input").value,
+            }),
         });
+        if (response.ok) {
+            document.getElementById("message_label").innerHTML =
+                "Sprememba gesla uspešna. \n Preusmerjanje na glavno stran";
+            return true;
+        } else {
+            document.getElementById("message_label").innerHTML =
+                "Sprememba gesla ni uspela. \n Poskusite ponovno!";
+            return false;
+        }
     } catch (error) {
+        document.getElementById("message_label").innerHTML =
+            "Sprememba gesla ni uspela. \n Poskusite ponovno!";
         console.error(error);
+        return false;
     }
 }
 
