@@ -1,4 +1,22 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL
+      - SMTP_USERNAME
+      - SMTP_KEY
+      - FROM_EMAIL
+      - REPLY_TO_EMAIL
+      - TO_EMAIL
+    depends_on:
+      - db
+    profiles:
+      - backend
   db:
     image: postgres:17
     container_name: my_postgres
