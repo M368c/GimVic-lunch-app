@@ -8,9 +8,10 @@ CREATE TABLE users (
 );
 
 CREATE TABLE lunch_optouts (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id uuid NOT NULL REFERENCES users(id),
-    date date NOT NULL,
-    issued_date TIMESTAMPTZ NOT NULL,
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null REFERENCES users(id),
+    date date not null,
+    issued_date TIMESTAMPTZ not null,
+    is_send boolean default false,
     UNIQUE(user_id, date)
 );
