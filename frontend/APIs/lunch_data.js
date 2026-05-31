@@ -8,19 +8,15 @@ export async function getLunchData() {
             method: "GET",
             credentials: "include",
         });
-        console.log("Lunch data on login: ", response.status);
         if (response.ok) {
             const data = await response.json();
             localStorage.removeItem("savedLunchData");
-            console.log("Lunch data are: ", JSON.stringify(data));
             localStorage.setItem("savedLunchData", JSON.stringify(data));
             return true;
         } else {
             return false;
         }
     } catch (error) {
-        console.log("Couldn't get lunch data! (frontend)");
-        console.error(error);
         return false;
     }
 }
@@ -35,7 +31,7 @@ export async function updateLunch(data) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            body: data,
         });
         if (!response.ok) {
             window.location.href = window.location.href.replace(
@@ -44,7 +40,7 @@ export async function updateLunch(data) {
             );
         }
     } catch (error) {
-        console.error(error);
-        console.log("DEBUG: Check if backend is running!");
+        document.getElementById("message_label").innerHTML =
+            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }

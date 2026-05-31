@@ -1,40 +1,21 @@
 import { logout } from "../APIs/login.js";
 import { getLunchData, updateLunch } from "../APIs/lunch_data.js";
 
-async function syncCalendarWithBackend() {
-    const localData = localStorage.getItem("calendarData");
-    const parsedData = JSON.parse(localData);
-    await updateLunch(parsedData);
+async function syncCalendarWithBackend(item) {
+    await updateLunch(item);
     await getLunchData();
-    localStorage.setItem("calendarData", null);
 }
 
 // Convert in right format and store in local storage
-function saveDateStatus(dateText, status) {
-    // Format: yyyy-mm-dd
+function formatDate(dateText, status) {
+    // Format: %Y-%m-%d
     var date_number = parseInt(dateText);
     if (date_number / 10 < 1) {
         dateText = `0${dateText}`;
     }
 
-    let calendarData = [];
-    if (localStorage.getItem("calendarData")) {
-        for (let i in JSON.parse(localStorage.getItem("calendarData"))) {
-            calendarData.push(i);
-        }
-    }
-
     const date = `${monthYearDateElement.textContent}-${dateText}`;
-
-    if (status === "ok") {
-        calendarData.push(JSON.parse(`{"status":"ok", "date":"${date}"}`));
-    } else if (status === "cancel") {
-        calendarData.push(JSON.parse(`{"status":"cancel", "date":"${date}"}`));
-    }
-
-    // Update the local storage
-    localStorage.setItem("calendarData", JSON.stringify(calendarData));
-    syncCalendarWithBackend();
+    syncCalendarWithBackend(`{"status":"${status}", "date":"${date}"}`);
 }
 
 // Main buttons for lunch handling
@@ -43,7 +24,7 @@ cancelBtn.addEventListener("click", () => {
     if (selected) {
         if (selected.id !== cancel_status) {
             selected.id = cancel_status;
-            saveDateStatus(selected.textContent, "cancel");
+            formatDate(selected.textContent, "cancel");
         }
         selected.classList.remove("selected");
     }
@@ -54,7 +35,7 @@ getBtn.addEventListener("click", () => {
     if (selected) {
         if (selected.id !== ok_status) {
             selected.id = ok_status;
-            saveDateStatus(selected.textContent, "ok");
+            formatDate(selected.textContent, "ok");
         }
         selected.classList.remove("selected");
     }

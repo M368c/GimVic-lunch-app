@@ -107,6 +107,24 @@
 .date.active {
     border: 2.5px solid rgb(63, 63, 63);
 }
+#ok.date.disabled {
+    background-color: #fafafa;
+    color: rgba(0, 128, 0, 0.58);
+    font-weight: 900;
+    cursor: default;
+}
+#cancel.date.disabled {
+    background-color: #fafafa;
+    color: rgba(255, 0, 0, 0.448);
+    font-weight: 900;
+    cursor: default;
+}
+#weekend.date.disabled {
+    background-color: #fafafa;
+    color: grey;
+    font-weight: 900;
+    cursor: default;
+}
 .date.selected {
     background-color: rgb(182, 182, 182) !important;
     color: rgb(0,0,0);
