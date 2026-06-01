@@ -4,8 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: backend
+    restart: always
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - DATABASE_URL
       - SMTP_USERNAME
@@ -20,12 +21,13 @@ services:
   db:
     image: postgres:17
     container_name: my_postgres
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./migrations/0000_init_up.sql:/0000_init_up.sql
