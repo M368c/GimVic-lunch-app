@@ -3,6 +3,11 @@
 # Run this file at same time every day
 # 0 8 * * * python main.py
 
+# POSSIBLE SETUPS
+# Generate both excel files
+# Send email containing all the email from previous day
+# Generate just "količine" file, if saop doesn't have import option for lunch cancellations
+
 import psycopg
 import os
 import openpyxl
