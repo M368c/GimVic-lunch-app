@@ -1,5 +1,6 @@
 mod auth;
 mod lunch;
+use crate::header::HeaderValue;
 use auth::login;
 use axum::extract::FromRef;
 use axum::middleware;
@@ -15,7 +16,7 @@ use axum_extra::extract::cookie::SameSite;
 use lettre::SmtpTransport;
 use lettre::transport::smtp::authentication::Credentials;
 use lunch::lunch_management;
-use tower_http::cors::{AllowOrigin, Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, Session, SessionManagerLayer};
 use tower_sessions_sqlx_store_chrono::PostgresStore;
 use uuid::Uuid;
@@ -115,8 +116,8 @@ async fn main() {
 
     // CORS policy
     let cors = CorsLayer::new()
-        .allow_origin(AllowOrigin::any()) // For production replace with domain name
-        .allow_methods(Any)
+        .allow_origin("http://127.0.0.1:5500".parse::<HeaderValue>().unwrap()) // For production replace with domain name
+        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
         .allow_credentials(true);
 
