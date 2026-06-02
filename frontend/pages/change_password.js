@@ -1,11 +1,5 @@
 import { change_password } from "../APIs/login.js";
 
-// User must populate all the inputs with data
-// Verify that the password in 2nd and 3rd input are the same
-// Check current password
-// Change old password with new in db
-// Return to pages/main.html
-
 const submit_btn = document.getElementById("submit_password_changes");
 const cancel_btn = document.getElementById("cancel_password_changes");
 
@@ -17,6 +11,10 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 submit_btn.addEventListener("click", () => {
     submit();
+});
+
+cancel_btn.addEventListener("click", () => {
+    cancel();
 });
 
 async function submit() {
@@ -32,10 +30,14 @@ async function submit() {
                 window.location.href = "/pages/main.html";
             }
         } else {
-            document.getElementById("message_label").innerHTML =
+            document.getElementById("message_label").textContent =
                 "Passwords don't match!";
         }
     } else
-        document.getElementById("message_label").innerHTML =
+        document.getElementById("message_label").textContent =
             "You must fill out all the fields";
+}
+
+function cancel() {
+    window.location.href = "/pages/main.html";
 }

@@ -1,13 +1,15 @@
 import { logout } from "../APIs/login.js";
 import { getLunchData, updateLunch } from "../APIs/lunch_data.js";
 
+updateCalendar();
+
 async function syncCalendarWithBackend(item) {
     try {
         await updateLunch(item);
         await getLunchData();
     } catch (error) {
         console.log(error);
-        document.getElementById("message_label").innerHTML =
+        document.getElementById("message_label").textContent =
             "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }
@@ -18,7 +20,7 @@ async function load_data() {
         restoreCalendarState();
     } catch (error) {
         console.log(error);
-        document.getElementById("message_label").innerHTML =
+        document.getElementById("message_label").textContent =
             "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }
@@ -94,8 +96,6 @@ function showUserProfile() {
         is_dropdown_open = false;
     }
 }
-
-updateCalendar();
 
 // Change password and login
 const change_password_button = document.getElementById("change-password");

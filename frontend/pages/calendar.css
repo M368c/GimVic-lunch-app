@@ -126,7 +126,7 @@
     cursor: default;
 }
 .date.selected {
-    background-color: rgb(182, 182, 182) !important;
+    background-color: rgb(156, 156, 156) !important;
     color: rgb(0,0,0);
 }
 .date.weekend:hover {
