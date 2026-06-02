@@ -6,7 +6,9 @@ export async function getLunchData() {
     try {
         const response = await fetch(url, {
             method: "GET",
+            cache: "no-store",
             credentials: "include",
+            headers: { "Cache-Control": "no-cache" },
         });
         if (response.ok) {
             const data = await response.json();

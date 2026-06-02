@@ -116,6 +116,7 @@ function restoreCalendarState() {
                 number = `0${day.textContent}`;
             }
 
+            let is_cancel = false;
             for (const item of lunchData) {
                 let value_string = item.date;
                 if (
@@ -124,7 +125,11 @@ function restoreCalendarState() {
                     number == value_string.substring(8, 10)
                 ) {
                     day.id = cancel_status;
+                    is_cancel = true;
                 }
+            }
+            if (is_cancel === false) {
+                day.id = ok_status;
             }
         });
     }

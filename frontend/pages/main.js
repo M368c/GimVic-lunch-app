@@ -2,9 +2,42 @@ import { logout } from "../APIs/login.js";
 import { getLunchData, updateLunch } from "../APIs/lunch_data.js";
 
 async function syncCalendarWithBackend(item) {
-    await updateLunch(item);
-    await getLunchData();
+    try {
+        await updateLunch(item);
+        await getLunchData();
+    } catch (error) {
+        console.log(error);
+        document.getElementById("message_label").innerHTML =
+            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
+    }
 }
+
+async function load_data() {
+    try {
+        await getLunchData();
+        restoreCalendarState();
+    } catch (error) {
+        console.log(error);
+        document.getElementById("message_label").innerHTML =
+            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
+    }
+}
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        load_data();
+    }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    load_data();
+});
+
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        load_data();
+    }
+});
 
 // Convert in right format and store in local storage
 function formatDate(dateText, status) {
