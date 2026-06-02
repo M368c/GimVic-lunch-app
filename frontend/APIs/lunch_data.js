@@ -33,12 +33,7 @@ export async function updateLunch(data) {
             },
             body: data,
         });
-        if (!response.ok) {
-            window.location.href = window.location.href.replace(
-                "pages/main.html",
-                "index.html",
-            );
-        }
+        if (!response.ok) window.location.href = "/index.html";
     } catch (error) {
         document.getElementById("message_label").innerHTML =
             "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";

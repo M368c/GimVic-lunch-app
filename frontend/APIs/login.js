@@ -2,19 +2,18 @@ import { server_url } from "./url.js";
 
 // Check for correct auth cookie
 export async function auth_status() {
+    const currentPath = window.location.pathname;
+    if (currentPath.includes("/pages/main.html")) {
+        return;
+    }
+
     const url = `${server_url}/api/auth_status`;
     try {
         const response = await fetch(url, {
             method: "GET",
             credentials: "include",
         });
-        if (response.ok) {
-            // Go to main page
-            window.location.href = window.location.href.replace(
-                "index.html",
-                "pages/main.html",
-            );
-        }
+        if (response.ok) window.location.href = "/pages/main.html";
     } catch (err) {}
 }
 
@@ -94,10 +93,7 @@ export async function logout() {
             },
         });
         if (response.ok) {
-            window.location.href = window.location.href.replace(
-                "pages/main.html",
-                "index.html",
-            ); // Go to login page
+            window.location.href = "/index.html";
             localStorage.clear();
         } else {
             console.log("Couldn't logout!");

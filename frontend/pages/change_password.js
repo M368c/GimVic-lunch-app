@@ -29,10 +29,7 @@ async function submit() {
             let is_ok_changed = await change_password();
             if (is_ok_changed) {
                 await sleep(1500);
-                window.location.href = window.location.href.replace(
-                    "pages/change_password.html",
-                    "pages/main.html",
-                );
+                window.location.href = "/pages/main.html";
             }
         } else {
             document.getElementById("message_label").innerHTML =

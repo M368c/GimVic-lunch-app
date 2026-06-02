@@ -69,10 +69,7 @@ const change_password_button = document.getElementById("change-password");
 const logout_button = document.getElementById("logout");
 
 change_password_button.addEventListener("click", () => {
-    window.location.href = window.location.href.replace(
-        "pages/main.html",
-        "pages/change_password.html",
-    );
+    window.location.href = "/pages/change_password.html";
 });
 
 logout_button.addEventListener("click", () => {
