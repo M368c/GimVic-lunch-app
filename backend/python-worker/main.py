@@ -12,10 +12,22 @@ import psycopg
 import os
 import openpyxl
 import datetime
+import smtplib
 from dotenv import load_dotenv
 
+# Load .env variables
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
+
+# SMTP
+smtp_username = os.getenv("SMTP_USERNAME")
+smtp_key = os.getenv("SMTP_KEY")
+
+# Email data
+from_email = os.getenv("FROM_EMAIL")
+#reply_to_email = os.getenv("REPLY_TO_EMAIL")
+to_email = os.getenv("TO_EMAIL")
+
 db_data = []
 
 date = datetime.date.today()
@@ -86,6 +98,15 @@ def create_mail_file():
 
     workbook.save(filename=files_path+excel_file_name1)
 
+def send_file():
+    """Send file on email via smtp"""
+    s = smtplib.SMTP('smtp-relay.brevo.com', 587)
+    s.starttls()
+    s.login(smtp_username, smtp_key)
+    message = "Message"
+    s.sendmail(from_email, to_email, message)
+    s.quit()
+
 def create_quantities_file():
     """Create excel file for managing specific food quantities"""
     workbook = openpyxl.Workbook()
@@ -98,5 +119,6 @@ def create_quantities_file():
 database()
 print(f"Creating excel files in {files_path}")
 create_mail_file()
-create_quantities_file()
+send_file()
+#create_quantities_file() - for now turned off
 print("Created!")

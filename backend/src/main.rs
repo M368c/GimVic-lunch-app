@@ -2,7 +2,6 @@ mod auth;
 mod lunch;
 use crate::header::HeaderValue;
 use auth::login;
-use axum::extract::FromRef;
 use axum::middleware;
 use axum::middleware::Next;
 use axum::{
@@ -13,19 +12,11 @@ use axum::{
     routing::{get, post},
 };
 use axum_extra::extract::cookie::SameSite;
-use lettre::SmtpTransport;
-use lettre::transport::smtp::authentication::Credentials;
 use lunch::lunch_management;
 use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, Session, SessionManagerLayer};
 use tower_sessions_sqlx_store_chrono::PostgresStore;
 use uuid::Uuid;
-
-#[derive(Clone, FromRef)]
-struct LunchState {
-    pool: sqlx::PgPool,
-    mailer: SmtpTransport,
-}
 
 #[tokio::main]
 async fn main() {
@@ -78,33 +69,6 @@ async fn main() {
         }
     };
 
-    let creds = Credentials::new(
-        match std::env::var("SMTP_USERNAME").to_owned() {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!("Could not get username for email services: {}", e);
-                std::process::exit(1);
-            }
-        },
-        match std::env::var("SMTP_KEY").to_owned() {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!("Could not get api key for email services: {}", e);
-                std::process::exit(1);
-            }
-        },
-    );
-
-    let mailer = match SmtpTransport::relay("smtp-relay.brevo.com") {
-        Ok(t) => t,
-        Err(e) => {
-            eprintln!("Failed to set connection for email: {}", e);
-            std::process::exit(1);
-        }
-    }
-    .credentials(creds)
-    .build();
-
     let session_layer = SessionManagerLayer::new(session_store)
         .with_path("/".to_string())
         .with_http_only(true)
@@ -124,26 +88,16 @@ async fn main() {
     let protected_routes = Router::new()
         .route("/api/auth_status", get(login::auth_status))
         .route("/api/lunch_data", get(lunch_management::lunch_data))
-        .route("/api/logout", post(login::logout))
-        .route("/api/change_password", post(login::change_password))
-        .route_layer(middleware::from_fn(auth));
-
-    let lunch_state = LunchState {
-        pool: pool.clone(),
-        mailer: mailer,
-    };
-
-    let lunch_route = Router::new()
         .route(
             "/api/update_lunch_data",
             post(lunch_management::lunch_handling),
         )
-        .with_state(lunch_state)
+        .route("/api/logout", post(login::logout))
+        .route("/api/change_password", post(login::change_password))
         .route_layer(middleware::from_fn(auth));
 
     let app = Router::new()
         .merge(protected_routes)
-        .merge(lunch_route)
         .route("/api/login", post(login::login))
         .with_state(pool)
         .layer(session_layer)
