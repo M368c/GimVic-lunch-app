@@ -3,7 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: backend
+      network: host
+    container_name: lunch-app-backend
     restart: always
     ports:
       - "127.0.0.1:3000:3000"
@@ -20,7 +21,7 @@ services:
       - backend
   db:
     image: postgres:17
-    container_name: my_postgres
+    container_name: lunch-app-db
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
