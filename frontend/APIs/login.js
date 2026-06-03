@@ -45,7 +45,7 @@ export async function login() {
         }
     } catch (error) {
         console.error(error);
-        document.getElementById("errorLabel").innerHTML =
+        document.getElementById("errorLabel").textContent =
             "Server is currently down!";
         return false;
     }
@@ -66,16 +66,16 @@ export async function change_password() {
             }),
         });
         if (response.ok) {
-            document.getElementById("message_label").innerHTML =
+            document.getElementById("message_label").textContent =
                 "Sprememba gesla uspešna. \n Preusmerjanje na glavno stran";
             return true;
         } else {
-            document.getElementById("message_label").innerHTML =
+            document.getElementById("message_label").textContent =
                 "Sprememba gesla ni uspela. \n Poskusite ponovno!";
             return false;
         }
     } catch (error) {
-        document.getElementById("message_label").innerHTML =
+        document.getElementById("message_label").textContent =
             "Sprememba gesla ni uspela. \n Poskusite ponovno!";
         console.error(error);
         return false;

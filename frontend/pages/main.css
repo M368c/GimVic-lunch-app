@@ -148,7 +148,7 @@ body {
     display: flex;
     gap: 15px;
 }
-#cancelBtn, #getBtn {
+#cancelBtn, #getBtn, #saveBtn {
     padding: 14px;
     font-size: 15px;
     border-radius: 30px;
@@ -162,7 +162,10 @@ body {
 #cancelBtn {
     color: red;
 }
-#cancelBtn:hover, #getBtn:hover {
+#saveBtn {
+    color: black;
+}
+#cancelBtn:hover, #getBtn:hover, #saveBtn:hover {
     background-color: #cecece;
     transition: 200ms;
 }

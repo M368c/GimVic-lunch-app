@@ -3,17 +3,6 @@ import { getLunchData, updateLunch } from "../APIs/lunch_data.js";
 
 updateCalendar();
 
-async function syncCalendarWithBackend(item) {
-    try {
-        await updateLunch(item);
-        await getLunchData();
-    } catch (error) {
-        console.log(error);
-        document.getElementById("message_label").textContent =
-            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
-    }
-}
-
 async function load_data() {
     try {
         await getLunchData();
@@ -41,7 +30,6 @@ window.addEventListener("pageshow", (event) => {
     }
 });
 
-// Convert in right format and store in local storage
 function formatDate(dateText, status) {
     // Format: %Y-%m-%d
     var date_number = parseInt(dateText);
@@ -50,7 +38,25 @@ function formatDate(dateText, status) {
     }
 
     const date = `${monthYearDateElement.textContent}-${dateText}`;
-    syncCalendarWithBackend(`{"status":"${status}", "date":"${date}"}`);
+    const obj = new Object();
+    obj.status = status;
+    obj.date = date;
+
+    const lunch_data =
+        JSON.parse(localStorage.getItem("calendarLunchData")) || [];
+    lunch_data.push(obj);
+    localStorage.setItem("calendarLunchData", JSON.stringify(lunch_data));
+}
+
+async function syncCalendarWithBackend(data) {
+    try {
+        await updateLunch(data);
+        await getLunchData();
+    } catch (error) {
+        console.log(error);
+        document.getElementById("message_label").textContent =
+            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
+    }
 }
 
 // Main buttons for lunch handling
@@ -73,6 +79,16 @@ getBtn.addEventListener("click", () => {
             formatDate(selected.textContent, "ok");
         }
         selected.classList.remove("selected");
+    }
+});
+
+saveBtn.addEventListener("click", () => {
+    if (JSON.parse(localStorage.getItem("calendarLunchData")) !== null) {
+        let calendar_data = JSON.parse(
+            localStorage.getItem("calendarLunchData"),
+        );
+        localStorage.setItem("calendarLunchData", null);
+        syncCalendarWithBackend(calendar_data);
     }
 });
 

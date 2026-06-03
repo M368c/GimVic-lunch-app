@@ -6,20 +6,21 @@ export async function getLunchData() {
     try {
         const response = await fetch(url, {
             method: "GET",
-            cache: "no-store",
+            //cache: "no-store",
             credentials: "include",
-            headers: { "Cache-Control": "no-cache" },
+            //headers: { "Cache-Control": "no-cache" },
         });
         if (response.ok) {
             const data = await response.json();
             localStorage.removeItem("savedLunchData");
             localStorage.setItem("savedLunchData", JSON.stringify(data));
-            return true;
         } else {
-            return false;
+            document.getElementById("message_label").textContent =
+                "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
         }
     } catch (error) {
-        return false;
+        document.getElementById("message_label").textContent =
+            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }
 
@@ -33,11 +34,14 @@ export async function updateLunch(data) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: data,
+            body: JSON.stringify(data),
         });
-        if (!response.ok) window.location.href = "/index.html";
+        if (!response.ok) {
+            document.getElementById("message_label").textContent =
+                "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
+        }
     } catch (error) {
-        document.getElementById("message_label").innerHTML =
+        document.getElementById("message_label").textContent =
             "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }

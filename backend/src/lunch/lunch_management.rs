@@ -1,5 +1,4 @@
-use axum::Json;
-use axum::extract::State;
+use axum::extract::{Json, State};
 use axum::http::status::StatusCode;
 use axum::response::IntoResponse;
 use chrono::{Datelike, NaiveDate, TimeZone, Utc};
@@ -15,8 +14,8 @@ pub struct LunchOptuots {
     pub date: NaiveDate,
 }
 
-#[derive(serde::Serialize)]
-pub struct DateResponse {
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LunchData {
     status: String,
     date: NaiveDate,
 }
@@ -50,7 +49,7 @@ pub async fn lunch_data(
 pub async fn get_lunch_data(
     user_id: Uuid,
     pool: sqlx::Pool<sqlx::Postgres>,
-) -> Result<Json<Vec<DateResponse>>, Box<dyn Error>> {
+) -> Result<Json<Vec<LunchData>>, Box<dyn Error>> {
     // Get lunch data from database
     let q: &str = "SELECT date FROM lunch_optouts WHERE user_id = $1";
     let rows: Vec<LunchOptuots> = sqlx::query_as::<_, LunchOptuots>(q)
@@ -61,7 +60,7 @@ pub async fn get_lunch_data(
     // Join rows in multiple response
     let response = rows
         .into_iter()
-        .map(|row| DateResponse {
+        .map(|row| LunchData {
             status: "cancel".to_string(),
             date: row.date,
         })
@@ -70,17 +69,18 @@ pub async fn get_lunch_data(
     Ok(Json(response))
 }
 
+#[axum::debug_handler]
 pub async fn lunch_handling(
     session: Session,
     State(pool): State<PgPool>,
-    lunch_update: Json<serde_json::Value>,
+    Json(lunch_data): Json<Vec<LunchData>>,
 ) -> StatusCode {
     let user_id: Uuid = match session.get::<Uuid>("user_id").await {
         Ok(Some(id)) => id,
         _ => return StatusCode::UNAUTHORIZED,
     };
 
-    match update_database(user_id, lunch_update, pool.clone()).await {
+    match update_database(user_id, lunch_data, pool.clone()).await {
         Ok(_) => StatusCode::OK,
         Err(e) => {
             println!("{}", e);
@@ -91,57 +91,51 @@ pub async fn lunch_handling(
 
 async fn update_database(
     user_id: Uuid,
-    lunch_update: Json<serde_json::Value>,
+    lunch_data: Vec<LunchData>,
     pool: sqlx::Pool<sqlx::Postgres>,
-) -> Result<(), Box<dyn Error>> {
-    let date_str = lunch_update
-        .get("date")
-        .and_then(|v| v.as_str())
-        .expect("Invalid date format!");
-    let status = lunch_update
-        .get("status")
-        .and_then(|v| v.as_str())
-        .expect("Invalid date format!");
-    let cancel_date =
-        NaiveDate::parse_from_str(date_str, "%Y-%m-%d").expect("Invalid date format!");
-    let current_datetime = Utc::now();
+) -> Result<(), Box<dyn std::error::Error>> {
+    for item in lunch_data {
+        let lunch_date = item.date;
+        let status = item.status;
 
-    let cancel_datetime = Utc
-        .with_ymd_and_hms(
-            cancel_date.year(),
-            cancel_date.month(),
-            cancel_date.day(),
-            8,
-            0,
-            0,
-        )
-        .unwrap();
+        let current_datetime = Utc::now();
 
-    if (cancel_datetime - current_datetime).num_hours() <= 24 {
-        println!("Too late for manage lunch for that date!");
-        return Ok(());
+        let cancel_datetime = Utc
+            .with_ymd_and_hms(
+                lunch_date.year(),
+                lunch_date.month(),
+                lunch_date.day(),
+                8,
+                0,
+                0,
+            )
+            .unwrap();
+
+        if (cancel_datetime - current_datetime).num_hours() <= 24 {
+            println!("Too late for manage lunch for that date!");
+        } else {
+            // INSERT or DELETE
+            if status == "cancel" {
+                let q: &str =
+                    "INSERT INTO lunch_optouts (user_id, date, issued_date) VALUES ($1, $2, $3)";
+
+                let _row = sqlx::query(q)
+                    .bind(user_id)
+                    .bind(lunch_date)
+                    .bind(current_datetime)
+                    .execute(&pool)
+                    .await?;
+                println!("Added in db for user {} and date {}", user_id, lunch_date);
+            } else if status == "ok" {
+                let q: &str = "DELETE FROM lunch_optouts WHERE user_id = $1 and date = $2";
+                let _row = sqlx::query(q)
+                    .bind(user_id)
+                    .bind(lunch_date)
+                    .execute(&pool)
+                    .await?;
+                println!("Removed in db for user {} and date {}", user_id, lunch_date);
+            }
+        }
     }
-
-    // INSERT or DELETE
-    if status == "cancel" {
-        let q: &str = "INSERT INTO lunch_optouts (user_id, date, issued_date) VALUES ($1, $2, $3)";
-
-        let _row = sqlx::query(q)
-            .bind(user_id)
-            .bind(cancel_date)
-            .bind(current_datetime)
-            .execute(&pool)
-            .await?;
-        println!("Added in db for user {} and date {}", user_id, date_str);
-    } else if status == "ok" {
-        let q: &str = "DELETE FROM lunch_optouts WHERE user_id = $1 and date = $2";
-        let _row = sqlx::query(q)
-            .bind(user_id)
-            .bind(cancel_date)
-            .execute(&pool)
-            .await?;
-        println!("Removed in db for user {} and date {}", user_id, date_str);
-    }
-
     Ok(())
 }
