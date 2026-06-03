@@ -9,8 +9,9 @@ const cancelBtn = document.getElementById("cancelBtn");
 const getBtn = document.getElementById("getBtn");
 const saveBtn = document.getElementById("saveBtn");
 
-const cancel_status = `cancel`;
-const ok_status = `ok`;
+const cancel_status = "cancel";
+const ok_status = "ok";
+const weekend_status = "weekend";
 
 const today = new Date();
 
@@ -128,7 +129,7 @@ function restoreCalendarState() {
                     is_cancel = true;
                 }
             }
-            if (is_cancel === false) {
+            if (is_cancel === false && day.id != weekend_status) {
                 day.id = ok_status;
             }
         });
