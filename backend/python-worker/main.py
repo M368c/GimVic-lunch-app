@@ -3,17 +3,20 @@
 # Run this file at same time every day
 # 0 8 * * * python main.py
 
-# POSSIBLE SETUPS
-# Generate both excel files
-# Send email containing all the email from previous day
-# Generate just "količine" file, if saop doesn't have import option for lunch cancellations
+# Send at 8.05 for next day
 
 import psycopg
 import os
 import openpyxl
 import datetime
 import smtplib
+from pathlib import Path
 from dotenv import load_dotenv
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 # Load .env variables
 load_dotenv()
@@ -32,12 +35,11 @@ db_data = []
 
 date = datetime.date.today()
 current_date = date.strftime("%Y%m%d")
-files_path = "../../generated_files/"
+tomorrow = date + datetime.timedelta(days=1)
+tomorrow_date = tomorrow.strftime("%Y%m%d")
 
-excel_file_name1 = f"kosilo-odjave-{current_date}.xlsx"
-excel_file_name2 = f"količine-{current_date}.xlsx"
-
-students = 300 # Number of registered students for lunch
+files_path = "../../generated_files/" # Change for production
+excel_file_lunch = f"kosilo-odjave-{current_date}.xlsx"
 
 def database():
     """Fetch data from db where is_send = false and than changes that param to true"""
@@ -50,31 +52,41 @@ def database():
             SELECT l.user_id, l.date, u.first_name, u.last_name 
             FROM lunch_optouts l
             JOIN users u ON l.user_id = u.id
-            WHERE l.is_send = false
+            WHERE l.is_send = false and l.date = %s
         """
-        cur.execute(query1)
+        cur.execute(query1, [tomorrow_date])
         rows = cur.fetchall()
 
         print(f"Odjave kosila: {cur.rowcount}")
 
         for row in rows:
             db_data.append((row[1], row[2], row[3]))
+        
+        if len(db_data) != 0:
+            return True
+        else: return False
+    
+    except psycopg.Error as e:
+        print(f"Error occurred while establishing connection: {e}")
 
-        # Set is_send to true
+def mark_as_sent():
+    try:
+        conn = psycopg.connect(database_url)
+        cur = conn.cursor()
         query2 = """
             UPDATE lunch_optouts
             SET is_send = true
-            WHERE is_send = false
+            WHERE is_send = false and date = %s
         """
-        cur.execute(query2)
+        cur.execute(query2, [tomorrow_date])
         conn.commit()
-        
-        #print(db_data)
+        print("Data successfully marked as sent")
 
     except psycopg.Error as e:
         print(f"Error occurred while establishing connection: {e}")
-    
-def create_mail_file():
+        print("Data not marked as sent!")
+
+def create_lunch_file():
     """Create excel file with data from db"""
     workbook = openpyxl.Workbook()
     sheet = workbook.active
@@ -96,29 +108,39 @@ def create_mail_file():
         last_name_cell = sheet.cell(row=index+2, column=3)
         last_name_cell.value = db_data[index][2]
 
-    workbook.save(filename=files_path+excel_file_name1)
-
+    workbook.save(filename=files_path+excel_file_lunch)
+    print("Created!")
+    
 def send_file():
     """Send file on email via smtp"""
-    s = smtplib.SMTP('smtp-relay.brevo.com', 587)
-    s.starttls()
-    s.login(smtp_username, smtp_key)
-    message = "Message"
-    s.sendmail(from_email, to_email, message)
-    s.quit()
+    msg = MIMEMultipart()
+    msg["From"] = from_email
+    msg["To"] = to_email
+    msg["Subject"] = "GimVič lunch app"
+    
+    lunch_file_path = Path(files_path+excel_file_lunch)
 
-def create_quantities_file():
-    """Create excel file for managing specific food quantities"""
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
-    sheet['A1'] = students - len(db_data)
+    if lunch_file_path.exists():
+        attachment_lunch = open(files_path+excel_file_lunch, "rb")
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment_lunch).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', "attachment; filename= %s" % excel_file_lunch)
+        msg.attach(part)
 
-    workbook.save(filename=files_path+excel_file_name2)
+        # Send mail
+        s = smtplib.SMTP('smtp-relay.brevo.com', 587)
+        s.starttls()
+        s.login(smtp_username, smtp_key)
+        text = msg.as_string()
+        s.sendmail(from_email, to_email, text)
+        s.quit()
 
+        print("Mail sent")
+    else: print("File doesn't exists!")
 
-database()
-print(f"Creating excel files in {files_path}")
-create_mail_file()
-send_file()
-#create_quantities_file() - for now turned off
-print("Created!")
+if database():
+    print(f"Creating excel file in {files_path}")
+    create_lunch_file()
+    send_file()
+    mark_as_sent()
