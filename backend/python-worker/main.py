@@ -44,7 +44,7 @@ excel_file_lunch = f"kosilo-odjave-{current_date}.xlsx"
 def database():
     """Fetch data from db where is_send = false and than changes that param to true"""
     try:
-        conn = psycopg.connect(database_url)
+        conn = psycopg.connect(database_url, host="localhost")
 
         cur = conn.cursor()
 
@@ -71,7 +71,7 @@ def database():
 
 def mark_as_sent():
     try:
-        conn = psycopg.connect(database_url)
+        conn = psycopg.connect(database_url, host="localhost")
         cur = conn.cursor()
         query2 = """
             UPDATE lunch_optouts
