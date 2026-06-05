@@ -1,7 +1,11 @@
 * { box-sizing: border-box; padding: 0}
+:root {
+    color-scheme: light dark;
+}
 
 body {
-    background-color: rgb(223, 223, 223);
+    background-color: light-dark(rgb(223 223 223), rgb(24 24 24));
+    color: light-dark(rgb(0,0,0), rbg(255, 255, 255));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -50,14 +54,14 @@ body {
     padding-left: 8px;
 }
 .user-dropdown-menu {
-    background-color: rgb(223, 223, 223);
+    background-color: light-dark(rgb(223, 223, 223), rgb(87, 87, 87));
     position: fixed;
     top: 70px;
     right: 10px;
     width: 200px;
     height: auto;
     text-align: center;
-    border: 0.5px solid grey;
+    border: 0.5px solid rgb(128, 128, 128);
     border-radius: 6px;
     padding: 20px;
     overflow: auto;
@@ -67,7 +71,7 @@ body {
     padding: 5px;
     border-radius: 8px;
     border: none;
-    background-color: rgb(223, 223, 223);
+    background-color: light-dark(rgb(223, 223, 223), rgb(87, 87, 87));
     cursor: pointer;
 }
 .user-dropdown-menu button:hover {
@@ -153,7 +157,7 @@ body {
     font-size: 15px;
     border-radius: 30px;
     border: none;
-    background-color: #f5f5f5;
+    background-color: light-dark(rgb(245, 245, 245), rgb(68, 68, 68));
     text-transform: uppercase;
 }
 #getBtn {
@@ -166,7 +170,7 @@ body {
     color: black;
 }
 #cancelBtn:hover, #getBtn:hover, #saveBtn:hover {
-    background-color: #cecece;
+    background-color: light-dark(rgb(206, 206, 206), rgb(40, 40, 40));
     transition: 200ms;
 }
 #message_label {
