@@ -117,6 +117,8 @@ def send_file():
     msg["From"] = from_email
     msg["To"] = to_email
     msg["Subject"] = "GimVič lunch app"
+    body = f"Odjave od kosila za dan {tomorrow.strftime("%d-%m-%Y")}"
+    msg.attach(MIMEText(body, 'plain'))
     
     lunch_file_path = Path(files_path+excel_file_lunch)
 
