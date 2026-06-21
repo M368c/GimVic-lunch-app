@@ -15,3 +15,9 @@ CREATE TABLE lunch_optouts (
     is_send boolean default false,
     UNIQUE(user_id, date)
 );
+
+CREATE TABLE holidays (
+    id uuid primary key default gen_random_uuid(),
+    date date not null,
+    UNIQUE(date)
+);

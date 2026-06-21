@@ -12,6 +12,7 @@ const saveBtn = document.getElementById("saveBtn");
 const cancel_status = "cancel";
 const ok_status = "ok";
 const weekend_status = "weekend";
+const holiday_status = "holiday";
 
 const today = new Date();
 
@@ -59,7 +60,7 @@ function updateCalendar() {
             id = "weekend";
         }
         if (date < today || date - today <= 86400000) {
-            datesHTML += `<button id="${id}" class="date ${activeClass} disabled ${weekend}" >${i}</button>`;
+            datesHTML += `<button id="${id}" class="date ${activeClass} disabled" >${i}</button>`;
         } else {
             datesHTML += `<button id="${id}" class="date ${activeClass} ${weekend}" >${i}</button>`;
         }
@@ -111,6 +112,7 @@ function restoreCalendarState() {
         const allDays = datesElement.querySelectorAll(".date:not(.inactive)");
 
         allDays.forEach((day) => {
+            console.log(day);
             // All numbers the same size
             let number = `${day.textContent}`;
             if (number / 10 < 1) {
@@ -119,13 +121,17 @@ function restoreCalendarState() {
 
             let is_cancel = false;
             for (const item of lunchData) {
-                let value_string = item.date;
+                let date = item.date;
+                let status = item.status;
                 if (
-                    monthYearDateElement.textContent ==
-                        value_string.substring(0, 7) &&
-                    number == value_string.substring(8, 10)
+                    monthYearDateElement.textContent == date.substring(0, 7) &&
+                    number == date.substring(8, 10)
                 ) {
-                    day.id = cancel_status;
+                    if (status == cancel_status) day.id = cancel_status;
+                    if (status == holiday_status) {
+                        day.id = holiday_status;
+                        day.className = "date disabled";
+                    }
                     is_cancel = true;
                 }
             }

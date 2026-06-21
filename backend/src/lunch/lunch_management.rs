@@ -14,7 +14,7 @@ pub struct LunchOptuots {
     pub date: NaiveDate,
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct LunchData {
     status: String,
     date: NaiveDate,
@@ -52,19 +52,32 @@ pub async fn get_lunch_data(
 ) -> Result<Json<Vec<LunchData>>, Box<dyn Error>> {
     // Get lunch data from database
     let q: &str = "SELECT date FROM lunch_optouts WHERE user_id = $1";
+    let q1: &str = "SELECT date FROM holidays";
     let rows: Vec<LunchOptuots> = sqlx::query_as::<_, LunchOptuots>(q)
         .bind(user_id)
         .fetch_all(&pool)
         .await?;
+    let rows1: Vec<LunchOptuots> = sqlx::query_as::<_, LunchOptuots>(q1)
+        .fetch_all(&pool)
+        .await?;
 
     // Join rows in multiple response
-    let response = rows
+    let mut response: Vec<LunchData> = rows
         .into_iter()
         .map(|row| LunchData {
             status: "cancel".to_string(),
             date: row.date,
         })
         .collect();
+
+    let mut response1: Vec<LunchData> = rows1
+        .into_iter()
+        .map(|row| LunchData {
+            status: "holiday".to_string(),
+            date: row.date,
+        })
+        .collect();
+    response.append(&mut response1);
 
     Ok(Json(response))
 }
