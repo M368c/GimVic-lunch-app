@@ -1,5 +1,6 @@
 body {
-  background-color: rgb(223, 223, 223);
+  background-color: light-dark(rgb(223 223 223), rgb(24 24 24));
+  color: light-dark(rgb(0,0,0), rgb(255, 255, 255));
   margin: 0;
   display: flex;
   justify-content: center;
@@ -22,9 +23,14 @@ body {
   text-align: center;
   height: 30px;
   border-radius: 5px;
-  border: 1px solid rgb(0, 0, 0);
+  border: 1px solid light-dark(rgb(122, 122, 122), rgb(63, 63, 63));
   font-size: 18px;
   padding: 5px;
+}
+
+.login input:focus {
+  border-color: light-dark(rgb(0, 0, 0), rgb(124, 124, 124));
+  outline: light-dark(rgb(0, 0, 0), rgb(124, 124, 124));
 }
 
 form {
@@ -39,7 +45,7 @@ form {
   width: auto;
   padding: 2px 10px;
   font-size: 16px;
-  background-color: rgb(208, 204, 204);
+  background-color: light-dark(rgb(208, 204, 204), rgb(94, 94, 94));
   border: 1px solid rgb(0, 0, 0);
   border-radius: 5px;
 }
@@ -52,7 +58,6 @@ form {
   position: absolute;
   text-align: center;
   margin-top: 262px;
-  color: rgb(3, 3, 3);
   font-size: 16px;
 }
 
