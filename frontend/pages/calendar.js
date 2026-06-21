@@ -112,7 +112,6 @@ function restoreCalendarState() {
         const allDays = datesElement.querySelectorAll(".date:not(.inactive)");
 
         allDays.forEach((day) => {
-            console.log(day);
             // All numbers the same size
             let number = `${day.textContent}`;
             if (number / 10 < 1) {
