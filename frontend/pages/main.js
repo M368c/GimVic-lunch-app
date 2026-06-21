@@ -126,7 +126,6 @@ logout_button.addEventListener("click", () => {
 });
 
 // Populate user profile with data
-// Also need the class for all the users -- add to db
 const userName = document.getElementById("user-name-label");
 const userComputerName = document.getElementById("user-computer");
 const userClass = document.getElementById("class-label");
@@ -135,14 +134,13 @@ const userUsername = document.getElementById("username-label");
 const parsed_data = JSON.parse(localStorage.getItem("UserData"));
 if (parsed_data == null) {
     logout();
+} else {
+    const first_name = parsed_data.first_name;
+    const last_name = parsed_data.last_name;
+    const username = parsed_data.username;
+    const full_name = `${first_name} ${last_name}`;
+
+    userName.textContent = full_name;
+    userComputerName.textContent = full_name;
+    userUsername.textContent = username;
 }
-
-const first_name = parsed_data.first_name;
-const last_name = parsed_data.last_name;
-const full_name = `${first_name} ${last_name}`;
-
-userName.textContent = full_name;
-userComputerName.textContent = full_name;
-userUsername.textContent = JSON.parse(
-    localStorage.getItem("UserData"),
-).username;

@@ -96,7 +96,9 @@ export async function logout() {
             window.location.href = "/index.html";
             localStorage.clear();
         } else {
-            console.log("Couldn't logout!");
+            if (confirm("Seja je potekla. Prijavite se znova!")) {
+                window.location.href = "/index.html";
+            }
         }
     } catch (error) {
         console.error(error);
