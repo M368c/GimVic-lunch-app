@@ -28,7 +28,7 @@ function updateCalendar() {
     const firstDayIndex = firstDay.getDay();
     const lastDayIndex = lastDay.getDay();
 
-    const monthYearString = currentDate.toLocaleString("default", {
+    const monthYearString = currentDate.toLocaleString("sl-SI", {
         month: "long",
         year: "numeric",
     });
