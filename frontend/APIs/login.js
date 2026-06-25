@@ -34,6 +34,10 @@ export async function login() {
             const data = await response.json();
             localStorage.setItem("UserData", JSON.stringify(data.user));
             return true;
+        } else if (response.status == 502) {
+            document.getElementById("errorLabel").textContent =
+                "Strežnik se trenutno ne odziva!";
+            return false;
         } else {
             document.getElementById("errorLabel").textContent =
                 "Poskusi ponovno!";
@@ -46,7 +50,7 @@ export async function login() {
     } catch (error) {
         console.error(error);
         document.getElementById("errorLabel").textContent =
-            "Server is currently down!";
+            "Strežnik se trenutno ne odziva!";
         return false;
     }
 }
