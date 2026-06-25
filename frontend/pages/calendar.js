@@ -127,10 +127,7 @@ function restoreCalendarState() {
                     number == date.substring(8, 10)
                 ) {
                     if (status == cancel_status) day.id = cancel_status;
-                    if (status == holiday_status) {
-                        day.id = holiday_status;
-                        day.className = "date disabled";
-                    }
+                    if (status == holiday_status) day.id = holiday_status;
                     is_cancel = true;
                 }
             }
