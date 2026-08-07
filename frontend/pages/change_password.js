@@ -27,7 +27,7 @@ async function submit() {
             let is_ok_changed = await change_password();
             if (is_ok_changed) {
                 await sleep(1500);
-                window.location.href = "/pages/main.html";
+                window.location.replace("/pages/main.html");
             }
         } else {
             document.getElementById("message_label").textContent =
@@ -39,5 +39,5 @@ async function submit() {
 }
 
 function cancel() {
-    window.location.href = "/pages/main.html";
+    window.location.replace("/pages/main.html");
 }

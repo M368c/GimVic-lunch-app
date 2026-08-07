@@ -13,7 +13,7 @@ export async function auth_status() {
             method: "GET",
             credentials: "include",
         });
-        if (response.ok) window.location.href = "/pages/main.html";
+        if (response.ok) window.location.replace("/pages/main.html");
     } catch (err) {}
 }
 
@@ -97,11 +97,11 @@ export async function logout() {
             },
         });
         if (response.ok) {
-            window.location.href = "/index.html";
+            window.location.replace("/index.html");
             localStorage.clear();
         } else {
             if (confirm("Seja je potekla. Prijavite se znova!")) {
-                window.location.href = "/index.html";
+                window.location.replace("/index.html");
             }
         }
     } catch (error) {
