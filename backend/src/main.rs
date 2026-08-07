@@ -12,7 +12,9 @@ use axum::{
     routing::{get, post},
 };
 use axum_extra::extract::cookie::SameSite;
+use axum_governor::{GovernorConfigBuilder, GovernorLayer, Quota, extractor::PeerIp, nz};
 use lunch::lunch_management;
+use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, Session, SessionManagerLayer};
 use tower_sessions_sqlx_store_chrono::PostgresStore;
@@ -30,6 +32,20 @@ async fn main() {
         }
     };
     println!("Server running on {}", addr);
+
+    let strict_cfg = GovernorConfigBuilder::default()
+        .with_extractor(PeerIp::default())
+        .expect_connect_info()
+        .quota_default(Quota::requests_per_minute(nz!(5u32)))
+        .finish()
+        .unwrap();
+
+    let normal_cfg = GovernorConfigBuilder::default()
+        .with_extractor(PeerIp::default())
+        .expect_connect_info()
+        .quota_default(Quota::requests_per_second(nz!(50u32)))
+        .finish()
+        .unwrap();
 
     let database_connection = match std::env::var("DATABASE_URL") {
         Ok(t) => t,
@@ -94,16 +110,23 @@ async fn main() {
         )
         .route("/api/logout", post(login::logout))
         .route("/api/change_password", post(login::change_password))
-        .route_layer(middleware::from_fn(auth));
+        .route_layer(middleware::from_fn(auth))
+        .layer(GovernorLayer::new(normal_cfg));
 
     let app = Router::new()
-        .merge(protected_routes)
         .route("/api/login", post(login::login))
+        .layer(GovernorLayer::new(strict_cfg))
+        .merge(protected_routes)
         .with_state(pool)
         .layer(session_layer)
         .layer(cors);
 
-    match axum::serve(listener, app).await {
+    match axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await
+    {
         Ok(t) => t,
         Err(e) => {
             eprintln!("{}", e);

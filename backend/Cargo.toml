@@ -32,3 +32,4 @@ tower-sessions-sqlx-store-chrono = { version = "0.14.2", features = [
 ] }
 tower-sessions = "0.14.0"
 axum = { version = "0.8.8", features = ["macros"] }
+axum-governor = "2.0.4"
