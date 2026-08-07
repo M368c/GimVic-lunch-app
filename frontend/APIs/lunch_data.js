@@ -36,7 +36,10 @@ export async function updateLunch(data) {
             },
             body: JSON.stringify(data),
         });
-        if (!response.ok) {
+        if (response.ok) {
+            document.getElementById("message_label").textContent =
+                "Spremembe shranjene";
+        } else {
             document.getElementById("message_label").textContent =
                 "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
         }

@@ -61,6 +61,7 @@ async function syncCalendarWithBackend(data) {
 
 // Main buttons for lunch handling
 cancelBtn.addEventListener("click", () => {
+    document.getElementById("message_label").textContent = null;
     let selected = datesElement.querySelector(".selected");
     if (selected) {
         if (selected.id !== cancel_status) {
@@ -72,6 +73,7 @@ cancelBtn.addEventListener("click", () => {
 });
 
 getBtn.addEventListener("click", () => {
+    document.getElementById("message_label").textContent = null;
     let selected = datesElement.querySelector(".selected");
     if (selected) {
         if (selected.id !== ok_status) {
