@@ -31,11 +31,11 @@ async function submit() {
             }
         } else {
             document.getElementById("message_label").textContent =
-                "Passwords don't match!";
+                "Gesli se ne ujemata!";
         }
     } else
         document.getElementById("message_label").textContent =
-            "You must fill out all the fields";
+            "Izpolni vsa polja!";
 }
 
 function cancel() {
