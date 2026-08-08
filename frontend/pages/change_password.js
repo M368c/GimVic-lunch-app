@@ -1,4 +1,5 @@
 import { change_password } from "../APIs/login.js";
+import { toast_notification } from "../APIs/server.js";
 
 const submit_btn = document.getElementById("submit_password_changes");
 const cancel_btn = document.getElementById("cancel_password_changes");
@@ -14,7 +15,7 @@ submit_btn.addEventListener("click", () => {
 });
 
 cancel_btn.addEventListener("click", () => {
-    cancel();
+    window.location.replace("/pages/main.html");
 });
 
 async function submit() {
@@ -30,14 +31,7 @@ async function submit() {
                 window.location.replace("/pages/main.html");
             }
         } else {
-            document.getElementById("message_label").textContent =
-                "Gesli se ne ujemata!";
+            toast_notification("Gesli se ne ujemata!", "Warning");
         }
-    } else
-        document.getElementById("message_label").textContent =
-            "Izpolni vsa polja!";
-}
-
-function cancel() {
-    window.location.replace("/pages/main.html");
+    } else toast_notification("Izpolni vsa polja!", "Warning");
 }

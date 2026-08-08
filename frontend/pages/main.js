@@ -9,8 +9,6 @@ async function load_data() {
         restoreCalendarState();
     } catch (error) {
         console.log(error);
-        document.getElementById("message_label").textContent =
-            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }
 
@@ -54,8 +52,6 @@ async function syncCalendarWithBackend(data) {
         await getLunchData();
     } catch (error) {
         console.log(error);
-        document.getElementById("message_label").textContent =
-            "Strežnik se trenutno ne odziva. Vpisani datumi ne bodo shranjeni!";
     }
 }
 

@@ -1,4 +1,4 @@
-import { server_url } from "./url.js";
+import { server_url, apiRequest, toast_notification } from "./server.js";
 
 // Check for correct auth cookie
 export async function auth_status() {
@@ -8,103 +8,77 @@ export async function auth_status() {
     }
 
     const url = `${server_url}/api/auth_status`;
-    try {
-        const response = await fetch(url, {
-            method: "GET",
-            credentials: "include",
-        });
-        if (response.ok) window.location.replace("/pages/main.html");
-    } catch (err) {}
+    const { data, error } = await apiRequest("auth status", url, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (error == null) {
+        window.location.replace("/pages/main.html");
+    }
 }
 
 // Login
 export async function login() {
     const url = `${server_url}/api/login`;
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-                username: document.getElementById("username").value,
-                password: document.getElementById("password").value,
-            }),
-        });
-        if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem("UserData", JSON.stringify(data.user));
-            return true;
-        } else if (response.status == 502) {
-            document.getElementById("errorLabel").textContent =
-                "Strežnik se trenutno ne odziva!";
-            return false;
-        } else {
-            document.getElementById("errorLabel").textContent =
-                "Poskusi ponovno!";
-            document.getElementById("errorIcon").innerHTML =
-                '<i class="fas fa-exclamation-circle" style="color: red;"></i>';
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-            return false;
-        }
-    } catch (error) {
-        console.error(error);
-        document.getElementById("errorLabel").textContent =
-            "Strežnik se trenutno ne odziva!";
+    const { data, error } = await apiRequest("login", url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value,
+        }),
+    });
+    if (error == null) {
+        localStorage.setItem("UserData", JSON.stringify(data.user));
+        return true;
+    } else {
+        document.getElementById("errorLabel").textContent = "Poskusi ponovno!";
+        document.getElementById("errorIcon").innerHTML =
+            '<i class="fas fa-exclamation-circle" style="color: red;"></i>';
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
         return false;
     }
 }
 
 export async function change_password() {
     const url = `${server_url}/api/change_password`;
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                password: document.getElementById("current_password_input")
-                    .value,
-                new_password:
-                    document.getElementById("new_password_input").value,
-            }),
-        });
-        if (response.ok) {
-            document.getElementById("message_label").textContent =
-                "Sprememba gesla uspešna. \n Preusmerjanje na glavno stran";
-            return true;
-        } else {
-            document.getElementById("message_label").textContent =
-                "Sprememba gesla ni uspela. \n Poskusite ponovno!";
-            return false;
-        }
-    } catch (error) {
-        document.getElementById("message_label").textContent =
-            "Sprememba gesla ni uspela. \n Poskusite ponovno!";
-        console.error(error);
+    const { data, error } = await apiRequest("change password", url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            password: document.getElementById("current_password_input").value,
+            new_password: document.getElementById("new_password_input").value,
+        }),
+    });
+    if (error == null) {
+        toast_notification(
+            "Sprememba gesla uspešna. Preusmerjanje na glavno stran",
+            "Success",
+        );
+        return true;
+    } else {
         return false;
     }
 }
 
 export async function logout() {
     const url = `${server_url}/api/logout`;
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        if (response.ok) {
+    const { data, error } = await apiRequest("logout", url, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    if (error == null) {
+        window.location.replace("/index.html");
+        localStorage.clear();
+    } else {
+        if (confirm("Seja je potekla. Prijavite se znova!")) {
             window.location.replace("/index.html");
-            localStorage.clear();
-        } else {
-            if (confirm("Seja je potekla. Prijavite se znova!")) {
-                window.location.replace("/index.html");
-            }
         }
-    } catch (error) {
-        console.error(error);
     }
 }

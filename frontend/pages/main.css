@@ -138,6 +138,11 @@ body {
     #username-label {
         font-size: 18px;
     }
+
+    .notyf {
+        margin-top: 75px;
+        z-index: -1;
+    }
 }
 
 .lunch-management {
