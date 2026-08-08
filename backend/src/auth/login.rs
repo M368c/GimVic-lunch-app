@@ -90,7 +90,6 @@ pub async fn login(
 
     if valid {
         let response = user_data_frontend(&user_data);
-        println!("Login successful!");
         match session.insert("user_id", user_data.id).await {
             Ok(_) => (StatusCode::OK, response).into_response(),
             Err(_) => {
@@ -98,9 +97,7 @@ pub async fn login(
             }
         }
     } else {
-        println!("Login failed!");
         (StatusCode::UNAUTHORIZED, "Invalid login!").into_response()
-        //Err("Wrong login data!".into())
     }
 }
 
@@ -123,8 +120,6 @@ pub async fn change_password(
     State(pool): State<sqlx::Pool<sqlx::Postgres>>,
     Json(data): Json<ChangePassword>,
 ) -> StatusCode {
-    println!("Changing password!");
-
     let user_id: Uuid = match session.get::<Uuid>("user_id").await {
         Ok(Some(id)) => id,
         _ => return StatusCode::UNAUTHORIZED,
@@ -150,34 +145,19 @@ pub async fn change_password(
                         .execute(&pool)
                         .await;
                     match new_row {
-                        Ok(_) => {
-                            println!("Successfully update password for user");
-                            StatusCode::OK
-                        }
-                        Err(_e) => {
-                            println!("Error while updating password for user");
-                            StatusCode::BAD_REQUEST
-                        }
+                        Ok(_) => StatusCode::OK,
+                        Err(_e) => StatusCode::BAD_REQUEST,
                     }
                 }
-                Ok(false) => {
-                    println!("Password not correct!");
-                    StatusCode::BAD_REQUEST
-                }
-                Err(e) => {
-                    println!("Error while changing password {} for user {}", e, user_id);
-                    StatusCode::BAD_REQUEST
-                }
+                Ok(false) => StatusCode::BAD_REQUEST,
+                Err(_e) => StatusCode::BAD_REQUEST,
             }
         }
         Ok(None) => {
             logout(session).await;
             StatusCode::NOT_FOUND
         }
-        Err(e) => {
-            println!("Error while changing password {} for user {}", e, user_id);
-            StatusCode::BAD_REQUEST
-        }
+        Err(_e) => StatusCode::BAD_REQUEST,
     }
 }
 

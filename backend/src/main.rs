@@ -143,7 +143,6 @@ async fn auth(session: Session, req: Request, next: Next) -> impl IntoResponse {
     if let Some(_id) = user_id {
         next.run(req).await
     } else {
-        println!("Session id not correct!");
         (StatusCode::UNAUTHORIZED, "Not authenticated").into_response()
     }
 }

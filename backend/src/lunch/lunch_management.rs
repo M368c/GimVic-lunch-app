@@ -1,7 +1,7 @@
 use axum::extract::{Json, State};
 use axum::http::status::StatusCode;
 use axum::response::IntoResponse;
-use chrono::{Datelike, NaiveDate, TimeZone, Utc};
+use chrono::{Datelike, FixedOffset, NaiveDate, TimeZone, Utc};
 use core::result::Result;
 use serde::Serialize;
 use sqlx::PgPool;
@@ -112,6 +112,8 @@ async fn update_database(
         let status = item.status;
 
         let current_datetime = Utc::now();
+        let offset = FixedOffset::east_opt(2 * 60 * 60).unwrap();
+        let now_with_offset = Utc::now().with_timezone(&offset);
 
         let cancel_datetime = Utc
             .with_ymd_and_hms(
@@ -138,7 +140,10 @@ async fn update_database(
                     .bind(current_datetime)
                     .execute(&pool)
                     .await?;
-                println!("Added in db for user {} and date {}", user_id, lunch_date);
+                println!(
+                    "Added in db for user {} and date {} at {}",
+                    user_id, lunch_date, now_with_offset
+                );
             } else if status == "ok" {
                 let q: &str = "DELETE FROM lunch_optouts WHERE user_id = $1 and date = $2";
                 let _row = sqlx::query(q)
@@ -146,7 +151,10 @@ async fn update_database(
                     .bind(lunch_date)
                     .execute(&pool)
                     .await?;
-                println!("Removed in db for user {} and date {}", user_id, lunch_date);
+                println!(
+                    "Removed in db for user {} and date {} at {}",
+                    user_id, lunch_date, now_with_offset
+                );
             }
         }
     }
