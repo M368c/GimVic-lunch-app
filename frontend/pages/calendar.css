@@ -94,12 +94,12 @@
 }
 
 .date.inactive {
-    color: rgb(204, 204, 204);
+    color: light-dark(rgb(204, 204, 204), rgb(136, 136, 136));
     cursor: default;
 }
 .date.inactive:hover {
     background: none;
-    color: rgb(204, 204, 204);
+    color: light-dark(rgb(204, 204, 204), rgb(136, 136, 136));
 }
 .date.active {
     border: 2.5px solid light-dark(rgb(63, 63, 63), rgb(94, 94, 94));
@@ -123,6 +123,6 @@
 
 #weekend, #holiday {
     background-color: light-dark(rgb(250, 250, 250), rgb(41, 40, 40)) !important;
-    color: rgb(204, 204, 204);
+    color: light-dark(rgb(136, 136, 136), rgb(204, 204, 204));
     cursor: default;
 }
