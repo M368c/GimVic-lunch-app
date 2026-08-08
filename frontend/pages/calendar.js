@@ -56,7 +56,7 @@ function updateCalendar() {
         let id = ok_status;
 
         if (date.getDay() === 6 || date.getDay() === 0) {
-            weekend = "weekend";
+            weekend = "disabled";
             id = "weekend";
         }
         if (date < today || date - today <= 86400000) {
@@ -131,7 +131,7 @@ function restoreCalendarState() {
                     is_cancel = true;
                 }
             }
-            if (is_cancel === false && day.id != weekend_status) {
+            if (is_cancel === false && day.id !== weekend_status) {
                 day.id = ok_status;
             }
         });
