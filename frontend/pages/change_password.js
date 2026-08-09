@@ -15,7 +15,7 @@ submit_btn.addEventListener("click", () => {
 });
 
 cancel_btn.addEventListener("click", () => {
-    window.location.replace("/pages/main.html");
+    window.location.replace("/pages/main");
 });
 
 async function submit() {
@@ -28,7 +28,7 @@ async function submit() {
             let is_ok_changed = await change_password();
             if (is_ok_changed) {
                 await sleep(1500);
-                window.location.replace("/pages/main.html");
+                window.location.replace("/pages/main");
             }
         } else {
             toast_notification("Gesli se ne ujemata!", "Warning");

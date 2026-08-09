@@ -16,7 +16,7 @@ async function submit() {
     let login_fn = await login();
     if (login_fn) {
         let data = await getLunchData();
-        if (data) window.location.replace("/pages/main.html");
-        else window.location.replace("/index.html");
+        if (data) window.location.replace("/pages/main");
+        else window.location.replace("/");
     }
 }

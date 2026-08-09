@@ -3,7 +3,7 @@ import { server_url, apiRequest, toast_notification } from "./server.js";
 // Check for correct auth cookie
 export async function auth_status() {
     const currentPath = window.location.pathname;
-    if (currentPath.includes("/pages/main.html")) {
+    if (currentPath.includes("/pages/main")) {
         return;
     }
 
@@ -13,7 +13,7 @@ export async function auth_status() {
         credentials: "include",
     });
     if (error == null) {
-        window.location.replace("/pages/main.html");
+        window.location.replace("/pages/main");
     }
 }
 
@@ -74,11 +74,11 @@ export async function logout() {
         },
     });
     if (error == null) {
-        window.location.replace("/index.html");
+        window.location.replace("/");
         localStorage.clear();
     } else {
         if (confirm("Seja je potekla. Prijavite se znova!")) {
-            window.location.replace("/index.html");
+            window.location.replace("/");
         }
     }
 }

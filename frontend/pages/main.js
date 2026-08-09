@@ -116,7 +116,7 @@ const change_password_button = document.getElementById("change-password");
 const logout_button = document.getElementById("logout");
 
 change_password_button.addEventListener("click", () => {
-    window.location.replace("/pages/change_password.html");
+    window.location.replace("/pages/change_password");
 });
 
 logout_button.addEventListener("click", () => {
