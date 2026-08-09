@@ -32,7 +32,10 @@ export async function apiRequest(name, url, options) {
         if (name === "lunch data") {
             return { data: null, error: "Podatki nedosegljivi" };
         } else if (!navigator.onLine) {
-            toast_notification("Ni internetne povezave", "Error");
+            toast_notification(
+                "Ni internetne povezave, spremembe ne bodo shranjene",
+                "Error",
+            );
             return { data: null, error: "Ni internetne povezave" };
         } else {
             toast_notification(

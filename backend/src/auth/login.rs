@@ -70,11 +70,7 @@ pub async fn login(
     let user_data: LoginData = match read(data.username.as_str(), pool.clone()).await {
         Ok(t) => t,
         Err(_) => {
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Reading db in login failed",
-            )
-                .into_response();
+            return (StatusCode::UNAUTHORIZED, "Invalid login!").into_response();
         }
     };
     let valid: bool = match verify(data.password.as_str(), &user_data.password) {
