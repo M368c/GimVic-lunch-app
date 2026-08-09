@@ -19,6 +19,18 @@ struct LoginData {
     password: String,
 }
 
+impl Default for LoginData {
+    fn default() -> Self {
+        return LoginData {
+            id: Uuid::new_v4(),
+            first_name: "first_name".to_string(),
+            last_name: "last_name".to_string(),
+            username: "username".to_string(),
+            password: "$2a$12$bWReyWZj/TPlHYssI112muTp0UNFZSl2BRc4C6qkPmgDBVZJFyIr.".to_string(),
+        };
+    }
+}
+
 #[derive(serde::Deserialize, sqlx::FromRow)]
 pub struct Data {
     username: String,
@@ -46,7 +58,7 @@ pub struct ChangePassword {
 async fn read(
     input_username: &str,
     pool: sqlx::Pool<sqlx::Postgres>,
-) -> Result<LoginData, Box<dyn Error + Send + Sync>> {
+) -> Result<(LoginData, bool), Box<dyn Error + Send + Sync>> {
     let q = "SELECT id, first_name, last_name, username, password FROM users WHERE username = $1";
     let row = sqlx::query_as::<_, LoginData>(q)
         .bind(input_username)
@@ -54,10 +66,10 @@ async fn read(
         .await?;
 
     match row {
-        Some(user) => Ok(user),
+        Some(user) => Ok((user, true)),
         None => {
-            println!("User not found in database");
-            Err("User not found in database".into())
+            let garbage_user = Default::default();
+            Ok((garbage_user, false))
         }
     }
 }
@@ -67,13 +79,11 @@ pub async fn login(
     State(pool): State<sqlx::Pool<sqlx::Postgres>>,
     Json(data): Json<Data>,
 ) -> Response {
-    let user_data: LoginData = match read(data.username.as_str(), pool.clone()).await {
+    let user_data: (LoginData, bool) = match read(data.username.as_str(), pool.clone()).await {
         Ok(t) => t,
-        Err(_) => {
-            return (StatusCode::UNAUTHORIZED, "Invalid login!").into_response();
-        }
+        Err(_) => return (StatusCode::UNAUTHORIZED, "Invalid login!").into_response(),
     };
-    let valid: bool = match verify(data.password.as_str(), &user_data.password) {
+    let valid: bool = match verify(data.password.as_str(), &user_data.0.password) {
         Ok(t) => t,
         Err(_) => {
             return (
@@ -84,9 +94,9 @@ pub async fn login(
         }
     };
 
-    if valid {
-        let response = user_data_frontend(&user_data);
-        match session.insert("user_id", user_data.id).await {
+    if valid && user_data.1 {
+        let response = user_data_frontend(&user_data.0);
+        match session.insert("user_id", user_data.0.id).await {
             Ok(_) => (StatusCode::OK, response).into_response(),
             Err(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "Session creation failed").into_response()
