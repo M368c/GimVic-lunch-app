@@ -8,7 +8,10 @@ export async function apiRequest(name, url, options) {
 
         if (!response.ok) {
             const error_msg = getErrorMessage(response.status);
-            if (name !== "login" && name !== "auth status")
+            if (
+                (name !== "login" || response.status === 429) &&
+                name !== "auth status"
+            )
                 toast_notification(error_msg, "Error");
             return {
                 data: null,
@@ -57,7 +60,7 @@ function getErrorMessage(status) {
         401: "Potrebno se je prijaviti.",
         403: "Nimaš dovoljenja za to dejanje",
         404: "Stran ni najdena",
-        429: "Preveč poslanih zahtev na strežnik.",
+        429: "Preveč poslanih zahtev na strežnik. Poskusi kasneje.",
         502: "Strežnik trenutno ni dosegljiv.",
         503: "Strežnik trenutno ni dosegljiv.",
         504: "Strežnik se ne odziva pravočasno.",
