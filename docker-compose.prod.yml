@@ -1,0 +1,39 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: lunch-app-nginx
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+      - backend
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      network: host
+    container_name: lunch-app-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - db
+  db:
+    image: postgres:17
+    container_name: lunch-app-db
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/0000_init_up.sql:/0000_init_up.sql
+
+volumes:
+  pgdata:

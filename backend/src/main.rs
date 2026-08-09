@@ -96,7 +96,7 @@ async fn main() {
 
     // CORS policy
     let cors = CorsLayer::new()
-        .allow_origin("http://127.0.0.1:5500".parse::<HeaderValue>().unwrap()) // For production replace with domain name
+        .allow_origin("http://127.0.0.1".parse::<HeaderValue>().unwrap()) // For production replace with domain name
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
         .allow_credentials(true);
