@@ -9,7 +9,9 @@ export async function apiRequest(name, url, options) {
         if (!response.ok) {
             const error_msg = getErrorMessage(response.status);
             if (
-                (name !== "login" || response.status === 429) &&
+                (name !== "login" ||
+                    response.status === 429 ||
+                    (response.status >= 500 && response.status < 600)) &&
                 name !== "auth status"
             )
                 toast_notification(error_msg, "Error");
