@@ -1,3 +1,4 @@
+use axum::Extension;
 use axum::extract::{Json, State};
 use axum::http::status::StatusCode;
 use axum::response::IntoResponse;
@@ -6,7 +7,6 @@ use core::result::Result;
 use serde::Serialize;
 use sqlx::PgPool;
 use std::error::Error;
-use tower_sessions::Session;
 use uuid::Uuid;
 
 #[derive(Serialize, sqlx::FromRow)]
@@ -21,24 +21,15 @@ pub struct LunchData {
 }
 
 pub async fn lunch_data(
-    session: Session,
+    Extension(user_id): Extension<Uuid>,
     State(pool): State<sqlx::Pool<sqlx::Postgres>>,
 ) -> impl IntoResponse {
-    let user_id: Uuid = match session.get::<Uuid>("user_id").await {
-        Ok(Some(id)) => id,
-        _ => {
-            return {
-                println!("Session expired!");
-                (StatusCode::UNAUTHORIZED, "Session expired").into_response()
-            };
-        }
-    };
     match get_lunch_data(user_id, pool).await {
         Ok(response) => response.into_response(),
         Err(e) => {
             println!("Error in lunch_data: {}", e);
             (
-                StatusCode::BAD_REQUEST,
+                StatusCode::INTERNAL_SERVER_ERROR,
                 "Error while getting lunch data from db!",
             )
                 .into_response()
@@ -84,15 +75,10 @@ pub async fn get_lunch_data(
 
 #[axum::debug_handler]
 pub async fn lunch_handling(
-    session: Session,
+    Extension(user_id): Extension<Uuid>,
     State(pool): State<PgPool>,
     Json(lunch_data): Json<Vec<LunchData>>,
 ) -> StatusCode {
-    let user_id: Uuid = match session.get::<Uuid>("user_id").await {
-        Ok(Some(id)) => id,
-        _ => return StatusCode::UNAUTHORIZED,
-    };
-
     match update_database(user_id, lunch_data, pool.clone()).await {
         Ok(_) => StatusCode::OK,
         Err(e) => {
@@ -128,34 +114,35 @@ async fn update_database(
 
         if (cancel_datetime - current_datetime).num_hours() <= 24 {
             println!("Too late for manage lunch for that date!");
-        } else {
-            // INSERT or DELETE
-            if status == "cancel" {
-                let q: &str =
-                    "INSERT INTO lunch_optouts (user_id, date, issued_date) VALUES ($1, $2, $3)";
+            return Ok(());
+        }
 
-                let _row = sqlx::query(q)
-                    .bind(user_id)
-                    .bind(lunch_date)
-                    .bind(current_datetime)
-                    .execute(&pool)
-                    .await?;
-                println!(
-                    "Added in db for user {} and date {} at {}",
-                    user_id, lunch_date, now_with_offset
-                );
-            } else if status == "ok" {
-                let q: &str = "DELETE FROM lunch_optouts WHERE user_id = $1 and date = $2";
-                let _row = sqlx::query(q)
-                    .bind(user_id)
-                    .bind(lunch_date)
-                    .execute(&pool)
-                    .await?;
-                println!(
-                    "Removed in db for user {} and date {} at {}",
-                    user_id, lunch_date, now_with_offset
-                );
-            }
+        // INSERT or DELETE
+        if status == "cancel" {
+            let q: &str =
+                "INSERT INTO lunch_optouts (user_id, date, issued_date) VALUES ($1, $2, $3)";
+
+            let _row = sqlx::query(q)
+                .bind(user_id)
+                .bind(lunch_date)
+                .bind(current_datetime)
+                .execute(&pool)
+                .await?;
+            println!(
+                "Added in db for user {} and date {} at {}",
+                user_id, lunch_date, now_with_offset
+            );
+        } else if status == "ok" {
+            let q: &str = "DELETE FROM lunch_optouts WHERE user_id = $1 and date = $2";
+            let _row = sqlx::query(q)
+                .bind(user_id)
+                .bind(lunch_date)
+                .execute(&pool)
+                .await?;
+            println!(
+                "Removed in db for user {} and date {} at {}",
+                user_id, lunch_date, now_with_offset
+            );
         }
     }
     Ok(())

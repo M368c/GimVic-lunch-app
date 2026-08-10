@@ -1,3 +1,4 @@
+use axum::Extension;
 use axum::extract::State;
 use axum::http::status::StatusCode;
 use axum::response::IntoResponse;
@@ -115,15 +116,10 @@ pub async fn logout(session: Session) -> StatusCode {
 }
 
 pub async fn change_password(
-    session: Session,
+    Extension(user_id): Extension<Uuid>,
     State(pool): State<sqlx::Pool<sqlx::Postgres>>,
     Json(data): Json<ChangePassword>,
 ) -> StatusCode {
-    let user_id: Uuid = match session.get::<Uuid>("user_id").await {
-        Ok(Some(id)) => id,
-        _ => return StatusCode::UNAUTHORIZED,
-    };
-
     let q: &str = "SELECT username, password FROM users WHERE id = $1";
     let row = sqlx::query_as::<_, LoginData>(q)
         .bind(user_id)
@@ -154,10 +150,7 @@ pub async fn change_password(
                 }
             }
         }
-        Ok(None) => {
-            logout(session).await;
-            StatusCode::NOT_FOUND
-        }
+        Ok(None) => StatusCode::NOT_FOUND,
         Err(e) => {
             eprintln!("Error when changing password! {}", e);
             StatusCode::INTERNAL_SERVER_ERROR
