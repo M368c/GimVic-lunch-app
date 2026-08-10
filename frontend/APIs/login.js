@@ -73,12 +73,7 @@ export async function logout() {
             "Content-Type": "application/json",
         },
     });
-    if (error == null) {
-        window.location.replace("/");
-        localStorage.clear();
-    } else {
-        if (confirm("Seja je potekla. Prijavite se znova!")) {
-            window.location.replace("/");
-        }
-    }
+
+    localStorage.clear();
+    window.location.replace("/");
 }
