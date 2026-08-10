@@ -83,12 +83,16 @@ pub async fn login(
 
     if is_valid && user_data.1 == true {
         let response = user_data_frontend(&user_data.0);
-        match session.insert("user_id", &user_data.0.id).await {
-            Ok(_) => (StatusCode::OK, response).into_response(),
-            Err(_) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, "Session creation failed").into_response()
-            }
+        if let Err(e) = session.insert("user_id", &user_data.0.id).await {
+            eprintln!("Session creation failed: {}", e);
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Session creation failed").into_response();
         }
+        if let Err(e) = session.cycle_id().await {
+            eprintln!("Session cycle failed: {}", e);
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Session cycle failed").into_response();
+        }
+
+        (StatusCode::OK, response).into_response()
     } else {
         (StatusCode::UNAUTHORIZED, "Invalid login!").into_response()
     }
