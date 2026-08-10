@@ -140,8 +140,8 @@ async fn auth(session: Session, mut req: Request, next: Next) -> impl IntoRespon
         return next.run(req).await;
     }
     let user_id: Option<Uuid> = session.get("user_id").await.unwrap_or(None);
-    if let Some(_id) = user_id {
-        req.extensions_mut().insert(user_id);
+    if let Some(id) = user_id {
+        req.extensions_mut().insert(id);
         next.run(req).await
     } else {
         (StatusCode::UNAUTHORIZED, "Not authenticated").into_response()
