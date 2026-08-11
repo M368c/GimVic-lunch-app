@@ -3,7 +3,7 @@ WORKDIR /app
 RUN cargo install cargo-chef
 
 FROM chef AS planner
-COPY . .
+COPY backend/ .
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN cargo chef cook --release --recipe-path recipe.json
 
-COPY . .
+COPY backend/ .
 RUN cargo build --release --bin backend
 
 FROM debian:bookworm-slim AS runner

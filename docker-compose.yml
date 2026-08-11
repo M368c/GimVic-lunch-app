@@ -20,6 +20,8 @@ services:
     restart: always
     ports:
       - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
     depends_on:
       - db
     profiles:
@@ -30,6 +32,8 @@ services:
     restart: always
     ports:
       - "127.0.0.1:5432:5432"
+    env_file:
+      - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./migrations/0000_init_up.sql:/0000_init_up.sql
