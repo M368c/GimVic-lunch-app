@@ -38,6 +38,7 @@ body {
     border-radius: 5px;
     padding: 5px;
     gap: 5px;
+    -webkit-tap-highlight-color: transparent;
 }
 .user-button i {
     margin-top: 5px;

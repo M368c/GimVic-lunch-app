@@ -49,6 +49,7 @@
     box-shadow: 0 0 4px rgba(0,0,0,0.2);
     color: light-dark(rgb(82, 82, 82), rgb(250, 250, 250));
     background-color: light-dark(rgb(250, 250, 250), rgb(82, 82, 82));
+    -webkit-tap-highlight-color: transparent;
 }
 .days {
     display: grid;
