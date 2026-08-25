@@ -33,6 +33,14 @@ async fn main() {
     };
     println!("Server running on {}", addr);
 
+    let website_url = match std::env::var("WEBSITE_URL") {
+        Ok(t) => t,
+        Err(_) => {
+            eprintln!("Couldn't find website url in .env file!");
+            std::process::exit(1);
+        }
+    };
+
     let strict_cfg = GovernorConfigBuilder::default()
         .with_extractor(PeerIp::default())
         .expect_connect_info()
@@ -96,7 +104,7 @@ async fn main() {
 
     // CORS policy
     let cors = CorsLayer::new()
-        .allow_origin("http://127.0.0.1".parse::<HeaderValue>().unwrap()) // For production replace with domain name
+        .allow_origin(website_url.parse::<HeaderValue>().unwrap())
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
         .allow_credentials(true);
