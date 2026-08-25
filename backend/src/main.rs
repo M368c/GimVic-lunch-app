@@ -97,7 +97,7 @@ async fn main() {
         .with_path("/".to_string())
         .with_http_only(true)
         .with_same_site(SameSite::Lax)
-        .with_secure(false) // true in production
+        .with_secure(true)
         .with_expiry(Expiry::OnInactivity(
             tower_sessions::cookie::time::Duration::days(14),
         )); // 14 days - maybe change for production
