@@ -1,6 +1,3 @@
-const server_url = "http://127.0.0.1";
-export { server_url };
-
 // Raw fetch request
 export async function apiRequest(name, url, options) {
     try {

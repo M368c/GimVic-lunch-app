@@ -1,4 +1,4 @@
-import { server_url, apiRequest, toast_notification } from "./server.js";
+import { apiRequest, toast_notification } from "./server.js";
 
 // Check for correct auth cookie
 export async function auth_status() {
@@ -7,7 +7,7 @@ export async function auth_status() {
         return;
     }
 
-    const url = `${server_url}/api/auth_status`;
+    const url = "/api/auth_status";
     const { data, error } = await apiRequest("auth status", url, {
         method: "GET",
         credentials: "include",
@@ -19,7 +19,7 @@ export async function auth_status() {
 
 // Login
 export async function login() {
-    const url = `${server_url}/api/login`;
+    const url = "/api/login";
     const { data, error } = await apiRequest("login", url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,7 +43,7 @@ export async function login() {
 }
 
 export async function change_password() {
-    const url = `${server_url}/api/change_password`;
+    const url = "/api/change_password";
     const { data, error } = await apiRequest("change password", url, {
         method: "POST",
         credentials: "include",
@@ -65,7 +65,7 @@ export async function change_password() {
 }
 
 export async function logout() {
-    const url = `${server_url}/api/logout`;
+    const url = "/api/logout";
     const { data, error } = await apiRequest("logout", url, {
         method: "POST",
         credentials: "include",

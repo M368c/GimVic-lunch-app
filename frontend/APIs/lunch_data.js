@@ -1,8 +1,8 @@
-import { server_url, apiRequest, toast_notification } from "./server.js";
+import { apiRequest, toast_notification } from "./server.js";
 
 // Lunch data for frontend
 export async function getLunchData() {
-    const url = `${server_url}/api/lunch_data`;
+    const url = "/api/lunch_data";
     const { data, error } = await apiRequest("lunch data", url, {
         method: "GET",
         cache: "no-store",
@@ -16,7 +16,7 @@ export async function getLunchData() {
 
 // Update database
 export async function updateLunch(lunch_data) {
-    const url = `${server_url}/api/update_lunch_data`;
+    const url = "/api/update_lunch_data";
     const { data, error } = await apiRequest("lunch update", url, {
         method: "POST",
         credentials: "include",
