@@ -13,8 +13,6 @@ services:
       - "80:80"
     depends_on:
       - db
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
   backend:
     build:
       context: .
