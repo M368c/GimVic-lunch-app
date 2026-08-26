@@ -1,8 +1,6 @@
 services:
   nginx:
-    build:
-      context: .
-      dockerfile: nginx/Dockerfile
+    image: ghcr.io/m368c/gimVic-lunch-app/nginx:latest
     container_name: lunch-app-nginx
     restart: always
     ports:
@@ -11,10 +9,7 @@ services:
       - db
       - backend
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-      network: host
+    image: ghcr.io/m368c/gimVic-lunch-app/backend:latest
     container_name: lunch-app-backend
     restart: always
     ports:
