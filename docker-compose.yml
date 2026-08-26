@@ -3,6 +3,10 @@ services:
     build:
       context: .
       dockerfile: nginx/Dockerfile
+    environment:
+      - BACKEND_HOST=host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     container_name: lunch-app-nginx
     restart: always
     ports:
