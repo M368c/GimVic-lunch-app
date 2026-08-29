@@ -15,17 +15,11 @@ sqlx = { version = "0.8.5", features = [
 ] }
 tower-http = { version = "0.6.8", features = ["cors"] }
 uuid = { version = "1.0", features = ["serde", "v4"] }
-jsonwebtoken = { version = "10.3.0", default-features = false, features = [
-    "rust_crypto",
-] }
-serde_json = "1"
 bcrypt = "0.19.0"
 serde = "1.0.228"
 dotenvy = "0.15"
 chrono = { version = "0.4.44", features = ["serde"] }
-axum-auth = "0.8.1"
 sqlx-cli = "0.8.6"
-jwt-verify = "0.1.0"
 axum-extra = { version = "0.12.5", features = ["cookie"] }
 tower-sessions-sqlx-store-chrono = { version = "0.14.2", features = [
     "postgres",
