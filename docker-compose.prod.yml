@@ -14,8 +14,6 @@ services:
     image: ghcr.io/m368c/gimvic-lunch-app/backend:latest
     container_name: lunch-app-backend
     restart: always
-    ports:
-      - "127.0.0.1:3000:3000"
     env_file:
       - .env
     depends_on:

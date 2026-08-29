@@ -13,21 +13,6 @@ services:
       - "80:80"
     depends_on:
       - db
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-      network: host
-    container_name: lunch-app-backend
-    restart: always
-    ports:
-      - "127.0.0.1:3000:3000"
-    env_file:
-      - .env
-    depends_on:
-      - db
-    profiles:
-      - backend
   db:
     image: postgres:17
     container_name: lunch-app-db
