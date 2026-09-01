@@ -3,8 +3,6 @@
 # Run this file at same time every day
 # 0 8 * * * python main.py
 
-# Send at 8.05 for next day
-
 import psycopg
 import os
 import openpyxl
@@ -48,9 +46,6 @@ tomorrow_date = tomorrow.strftime("%Y%m%d")
 
 files_path = "../../generated_files/" # Change for production
 excel_file_lunch = f"kosilo-odjave-{current_date}.xlsx"
-
-# Website url
-url = "https://www.gimvic.org/delovanjesole/pouk/koledar/"
 
 def database():
     """Fetch data from db where is_send = false and than changes that param to true"""
@@ -176,7 +171,7 @@ if database():
     mark_as_sent()
 
 if today.month == 8:
-    pdf_file = get_pdf_from_website(url)
+    pdf_file = get_pdf_from_website()
     holidays_dates = parse_pdf(pdf_file)
 
     update_db_with_holidays(holidays_dates)

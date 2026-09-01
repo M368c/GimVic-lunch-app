@@ -8,7 +8,10 @@ from io import BytesIO
 today = datetime.date.today()
 current_year = today.year
 
-def get_pdf_from_website(url):
+# Website url
+url = "https://www.gimvic.org/delovanjesole/pouk/koledar/"
+
+def get_pdf_from_website():
     """Get pdf file from website"""
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
