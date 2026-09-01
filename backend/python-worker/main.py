@@ -170,7 +170,7 @@ if database():
     send_file()
     mark_as_sent()
 
-if today.month == 8:
+if today.month == 9:
     pdf_file = get_pdf_from_website()
     holidays_dates = parse_pdf(pdf_file)
 
