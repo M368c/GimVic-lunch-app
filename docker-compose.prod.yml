@@ -7,6 +7,8 @@ services:
     restart: always
     ports:
       - "127.0.0.1:8888:80"
+    env_file:
+      - .env
     depends_on:
       - db
       - backend
