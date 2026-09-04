@@ -120,6 +120,7 @@ pub async fn logout(session: Session) -> StatusCode {
 }
 
 pub async fn change_password(
+    session: Session,
     Extension(user_id): Extension<Uuid>,
     State(pool): State<sqlx::Pool<sqlx::Postgres>>,
     Json(data): Json<ChangePassword>,
@@ -147,7 +148,13 @@ pub async fn change_password(
                 .execute(&pool)
                 .await;
             match new_row {
-                Ok(_) => StatusCode::OK,
+                Ok(_) => {
+                    if let Err(e) = session.cycle_id().await {
+                        eprintln!("Session cycle failed: {}", e);
+                        return StatusCode::INTERNAL_SERVER_ERROR;
+                    }
+                    StatusCode::OK
+                }
                 Err(e) => {
                     eprintln!("Error when changing password! {}", e);
                     StatusCode::INTERNAL_SERVER_ERROR
