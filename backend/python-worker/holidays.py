@@ -43,25 +43,28 @@ def parse_pdf(pdf_path):
     months_list = {}
     holidays = []
 
-    # Colors
-    BLUE = (0.871, 0.918, 0.965)
-    YELLOW = (1.0, 0.949, 0.8)
+    # Holidays color
+    YELLOW = (1.0, 0.95, 0.8)
     
     pdf = pdfplumber.open(pdf_path)
 
     page = pdf.pages[0]
     all_rects = page.rects
 
+    counter = 0
     for item in all_rects:
-        if tuple(item["non_stroking_color"]) == YELLOW:
-            rects = check_for_multiple_rects(item, page)
-            for i in rects:
-                holidays.append([i[0].split(".")[0], i[1]])
-
-        elif tuple(item["non_stroking_color"]) == BLUE:
+        if counter < 1: # Months
             rects = check_for_multiple_rects(item, page)
             for i in rects:
                 months_list[i[0]] = i[1]
+
+        item_color = tuple(item["non_stroking_color"])
+        item_color_round = (round(item_color[0], 2), round(item_color[1], 2), round(item_color[2], 2))
+        if item_color_round == YELLOW:
+            rects = check_for_multiple_rects(item, page)
+            for i in rects:
+                holidays.append([i[0].split(".")[0], i[1]])
+        counter+=1
 
     pdf.close()
 
@@ -77,20 +80,27 @@ def parse_pdf(pdf_path):
     # Add july and august days
     july_august_dates = np.arange(f"{current_year+1}-07", f"{current_year+1}-09", dtype='datetime64[D]')
     holidays_list.extend(d.tolist() for d in july_august_dates)
-    
+    print(holidays_list)
     return holidays_list
 
 def check_for_multiple_rects(item, page):
-    vlines = [l for l in page.lines if abs(l["x0"] - l["x1"]) < 0.5]
+    vlines = [l for l in page.curves+page.edges if abs(l["x0"] - l["x1"]) < 0.5]
     top, bottom = item["top"], item["bottom"]
     x0, x1 = item["x0"], item["x1"]
     margin = 2.0
+    line_distance = 2.0
 
-    inner_xs = sorted(set(
-        round(l["x0"], 1) for l in vlines
+    raw_xs = sorted(set(
+        l["x0"] for l in vlines
         if x0 + margin < l["x0"] < x1 - margin
         and l["top"] <= bottom and l["bottom"] >= top
     ))
+
+    inner_xs = []
+    for x in raw_xs:
+        if inner_xs and x - inner_xs[-1] < line_distance:
+            continue
+        inner_xs.append(x)
 
     if not inner_xs:
         text = extract_text_from_rect(item, page)
