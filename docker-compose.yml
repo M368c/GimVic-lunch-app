@@ -25,7 +25,6 @@ services:
       - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./migrations/0000_init_up.sql:/0000_init_up.sql
   adminer:
     image: adminer
     container_name: my_adminer

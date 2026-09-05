@@ -55,7 +55,7 @@ def database():
         cur = conn.cursor()
 
         query1 = """
-            SELECT l.user_id, l.date, u.first_name, u.last_name 
+            SELECT l.date, u.first_name, u.last_name, u.graduation_year, u.class_letter
             FROM lunch_optouts l
             JOIN users u ON l.user_id = u.id
             WHERE l.is_send = false and l.date = %s
@@ -66,7 +66,7 @@ def database():
         print(f"Odjave kosila: {cur.rowcount}")
 
         for row in rows:
-            db_data.append((row[1], row[2], row[3]))
+            db_data.append(tuple(row))
         
         if len(db_data) != 0:
             return True
@@ -98,7 +98,7 @@ def create_lunch_file():
     sheet = workbook.active
 
     # Names of columns
-    names_columns = ["datum", "ime", "priimek"]
+    names_columns = ["datum", "ime", "priimek", "razred"]
     for index in range(len(names_columns)):
         cell = sheet.cell(row=1, column=index+1)
         cell.value = names_columns[index]
@@ -113,6 +113,15 @@ def create_lunch_file():
 
         last_name_cell = sheet.cell(row=index+2, column=3)
         last_name_cell.value = db_data[index][2]
+
+        # Class
+        graduation_year = db_data[index][3]
+        class_letter = db_data[index][4]
+        class_number = graduation_year-today.year+1
+        user_class = str(class_number)+class_letter
+
+        class_cell = sheet.cell(row=index+2, column=4)
+        class_cell.value = user_class
 
     workbook.save(filename=files_path+excel_file_lunch)
     print("Created!")

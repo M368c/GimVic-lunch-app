@@ -1,6 +1,6 @@
 target/
 .env
 .venv/
-generated_files/*
+generated_files/
 __pycache__/
 *.pyc
