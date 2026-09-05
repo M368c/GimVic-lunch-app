@@ -44,7 +44,7 @@ current_date = today.strftime("%Y%m%d")
 tomorrow = today + datetime.timedelta(days=1)
 tomorrow_date = tomorrow.strftime("%Y%m%d")
 
-files_path = "../../generated_files/" # Change for production
+files_path = "generated_files/"
 excel_file_lunch = f"kosilo-odjave-{current_date}.xlsx"
 
 def database():
