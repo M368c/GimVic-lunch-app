@@ -1,7 +1,12 @@
 mod auth;
 mod lunch;
-use crate::header::HeaderValue;
+use auth::change_password;
 use auth::login;
+use auth::logout;
+use lunch::lunch_data;
+use lunch::update_data;
+
+use crate::header::HeaderValue;
 use axum::middleware;
 use axum::middleware::Next;
 use axum::{
@@ -13,7 +18,6 @@ use axum::{
 };
 use axum_extra::extract::cookie::SameSite;
 use axum_governor::{GovernorConfigBuilder, GovernorLayer, Quota, extractor::PeerIp, nz};
-use lunch::lunch_management;
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, Session, SessionManagerLayer};
@@ -76,7 +80,7 @@ async fn main() {
         }
     };
 
-    match sqlx::migrate!("./migrations").run(&pool).await {
+    match sqlx::migrate!().run(&pool).await {
         Ok(t) => t,
         Err(e) => {
             eprintln!("Failed to run migrations: {}", e);
@@ -100,7 +104,7 @@ async fn main() {
         .with_secure(true)
         .with_expiry(Expiry::OnInactivity(
             tower_sessions::cookie::time::Duration::days(14),
-        )); // 14 days - maybe change for production
+        ));
 
     // CORS policy
     let cors = CorsLayer::new()
@@ -111,13 +115,16 @@ async fn main() {
 
     let protected_routes = Router::new()
         .route("/api/auth_status", get(login::auth_status))
-        .route("/api/lunch_data", get(lunch_management::lunch_data))
+        .route("/api/lunch_data", get(lunch_data::get_lunch_data))
         .route(
             "/api/update_lunch_data",
-            post(lunch_management::lunch_handling),
+            post(update_data::update_lunch_data),
         )
-        .route("/api/logout", post(login::logout))
-        .route("/api/change_password", post(login::change_password))
+        .route("/api/logout", post(logout::logout))
+        .route(
+            "/api/change_password",
+            post(change_password::change_password),
+        )
         .route_layer(middleware::from_fn(auth))
         .layer(GovernorLayer::new(normal_cfg));
 
