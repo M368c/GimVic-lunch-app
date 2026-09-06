@@ -10,7 +10,7 @@ use uuid::Uuid;
 use super::LunchData;
 
 #[derive(Serialize, sqlx::FromRow)]
-pub struct LunchOptuots {
+pub struct LunchOptouts {
     pub date: NaiveDate,
 }
 
@@ -20,7 +20,7 @@ pub async fn get_lunch_data(
 ) -> Response {
     let q: &str = "SELECT date FROM lunch_optouts WHERE user_id = $1";
     let q1: &str = "SELECT date FROM holidays";
-    let dates: Vec<LunchOptuots> = match sqlx::query_as::<_, LunchOptuots>(q)
+    let dates: Vec<LunchOptouts> = match sqlx::query_as::<_, LunchOptouts>(q)
         .bind(user_id)
         .fetch_all(&pool)
         .await
@@ -36,8 +36,8 @@ pub async fn get_lunch_data(
         }
     };
 
-    let holidays: Vec<LunchOptuots> =
-        match sqlx::query_as::<_, LunchOptuots>(q1).fetch_all(&pool).await {
+    let holidays: Vec<LunchOptouts> =
+        match sqlx::query_as::<_, LunchOptouts>(q1).fetch_all(&pool).await {
             Ok(data) => data,
             Err(e) => {
                 eprintln!("Error while trying to get holiday data: {}", e);
