@@ -21,8 +21,8 @@ pub async fn update_lunch_data(
             lunch_date.year(),
             lunch_date.month(),
             lunch_date.day(),
-            8,
-            0,
+            7,
+            55,
             0,
         ) {
             LocalResult::Single(v) => v,

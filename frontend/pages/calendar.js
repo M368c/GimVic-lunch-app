@@ -49,7 +49,7 @@ function updateCalendar() {
 
     for (let i = 1; i <= totalDays; i++) {
         const date = new Date(currentYear, lastMonth, i);
-        date.setHours(8, 0, 0, 0);
+        date.setHours(7, 55, 0, 0);
         const activeClass =
             date.toDateString() === new Date().toDateString() ? "active" : "";
         let weekend = "";
