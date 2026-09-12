@@ -78,7 +78,7 @@ function updateCalendar() {
 
 // User can view data just for current month and next one
 prevBtn.addEventListener("click", () => {
-    if (currentDate.getMonth() - 1 >= new Date().getMonth()) {
+    if (currentDate.getMonth() !== 8) {
         currentDate.setDate(1);
         currentDate.setMonth(currentDate.getMonth() - 1);
         updateCalendar();
